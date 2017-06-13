@@ -1,0 +1,1 @@
+cd /Users/yilu/Projects/mysql-server && '/Applications/CMake.app/Contents/bin/cpack' -G TGZ --config CPackConfig.cmake

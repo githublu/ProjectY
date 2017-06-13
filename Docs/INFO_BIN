@@ -1,0 +1,81 @@
+===== Information about the build process: =====
+Build was run at 2017-06-11 15:54:37 on host 'Yis-MacBook-Pro.local'
+
+Build was done on  Darwin-16.5.0 using x86_64
+Build was done using cmake 3.8.1 
+
+===== Compiler flags used (from the 'sql/' subdirectory): =====
+# compile C with /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc
+# compile CXX with /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
+C_FLAGS =  -Wall -Wextra -Wformat-security -Wvla -Wwrite-strings -Wdeclaration-after-statement -g -fno-omit-frame-pointer -fno-strict-aliasing -DENABLED_DEBUG_SYNC -DSAFE_MUTEX   -DHAVE_YASSL -DYASSL_PREFIX -DHAVE_OPENSSL -DMULTI_THREADED
+C_DEFINES = -DGTEST_USE_OWN_TR1_TUPLE=1 -DHAVE_CONFIG_H -DHAVE_LIBEVENT1 -DHAVE_REPLICATION -DMYSQL_SERVER
+C_INCLUDES = -I/Users/yilu/Projects/mysql-server/include -I/Users/yilu/Projects/mysql-server/extra/rapidjson/include -I/Users/yilu/Projects/mysql-server/libbinlogevents/include -I/Users/yilu/Projects/mysql-server/libbinlogevents/export -I/Users/yilu/Projects/mysql-server/sql/conn_handler -I/Users/yilu/Projects/mysql-server/sql -I/Users/yilu/Projects/mysql-server/sql/auth -I/Users/yilu/Projects/mysql-server/regex -I/Users/yilu/Projects/mysql-server/zlib -I/Users/yilu/Projects/mysql-server/extra/yassl/include -I/Users/yilu/Projects/mysql-server/extra/yassl/taocrypt/include -I/Users/yilu/Projects/mysql-server/extra/lz4 
+CXX_FLAGS =  -Wall -Wextra -Wformat-security -Wvla -Woverloaded-virtual -Wno-unused-parameter -Wno-null-conversion -Wno-unused-private-field -g -fno-omit-frame-pointer -fno-strict-aliasing -DENABLED_DEBUG_SYNC -DSAFE_MUTEX   -DHAVE_YASSL -DYASSL_PREFIX -DHAVE_OPENSSL -DMULTI_THREADED
+CXX_DEFINES = -DGTEST_USE_OWN_TR1_TUPLE=1 -DHAVE_CONFIG_H -DHAVE_LIBEVENT1 -DHAVE_REPLICATION -DMYSQL_SERVER
+CXX_INCLUDES = -I/Users/yilu/Projects/mysql-server/include -I/Users/yilu/Projects/mysql-server/extra/rapidjson/include -I/Users/yilu/Projects/mysql-server/libbinlogevents/include -I/Users/yilu/Projects/mysql-server/libbinlogevents/export -I/Users/yilu/Projects/mysql-server/sql/conn_handler -I/Users/yilu/Projects/mysql-server/sql -I/Users/yilu/Projects/mysql-server/sql/auth -I/Users/yilu/Projects/mysql-server/regex -I/Users/yilu/Projects/mysql-server/zlib -I/Users/yilu/Projects/mysql-server/extra/yassl/include -I/Users/yilu/Projects/mysql-server/extra/yassl/taocrypt/include -I/Users/yilu/Projects/mysql-server/extra/lz4 
+
+Pointer size: 8
+
+===== Feature flags used: =====
+-- Cache values
+BOOST_INCLUDE_DIR:PATH=/Users/yilu/mysql-bin/boost/boost_1_59_0
+BUNDLE_MECAB:BOOL=ON
+CMAKE_BUILD_TYPE:STRING=Debug
+CMAKE_INSTALL_PREFIX:PATH=/Users/yilu/mysql-bin/5.7
+CMAKE_OSX_ARCHITECTURES:STRING=
+CMAKE_OSX_DEPLOYMENT_TARGET:STRING=
+CMAKE_OSX_SYSROOT:STRING=
+COMMUNITY_BUILD:BOOL=ON
+CORESERVICES:FILEPATH=/System/Library/Frameworks/CoreServices.framework
+DOWNLOAD_BOOST:BOOL=1
+DOWNLOAD_BOOST_TIMEOUT:STRING=600
+ENABLED_PROFILING:BOOL=ON
+ENABLE_DOWNLOADS:BOOL=OFF
+ENABLE_DTRACE:BOOL=ON
+ENABLE_GCOV:BOOL=OFF
+ENABLE_GPROF:BOOL=OFF
+ENABLE_MEMCACHED_SASL:BOOL=OFF
+ENABLE_MEMCACHED_SASL_PWDB:BOOL=OFF
+FEATURE_SET:STRING=community
+INSTALL_LAYOUT:STRING=STANDALONE
+INSTALL_PKGCONFIGDIR:PATH=
+LOCAL_BOOST_DIR:FILEPATH=/Users/yilu/mysql-bin/boost/boost_1_59_0
+MUTEXTYPE:STRING=event
+MYSQL_DATADIR:PATH=/usr/local/mysql/data
+MYSQL_KEYRINGDIR:PATH=/usr/local/mysql/keyring
+MYSQL_MAINTAINER_MODE:BOOL=OFF
+OPTIMIZER_TRACE:BOOL=ON
+TMPDIR:PATH=P_tmpdir
+WITH_ARCHIVE_STORAGE_ENGINE:BOOL=ON
+WITH_ASAN:BOOL=OFF
+WITH_BLACKHOLE_STORAGE_ENGINE:BOOL=ON
+WITH_BOOST:PATH=/Users/yilu/mysql-bin/boost
+WITH_CLIENT_PROTOCOL_TRACING:BOOL=ON
+WITH_DEBUG:BOOL=1
+WITH_DEFAULT_COMPILER_OPTIONS:BOOL=ON
+WITH_DEFAULT_FEATURE_SET:BOOL=ON
+WITH_EDITLINE:STRING=bundled
+WITH_EMBEDDED_SERVER:BOOL=OFF
+WITH_EXTRA_CHARSETS:STRING=all
+WITH_FEDERATED_STORAGE_ENGINE:BOOL=ON
+WITH_INNODB_EXTRA_DEBUG:BOOL=OFF
+WITH_INNODB_MEMCACHED:BOOL=OFF
+WITH_LIBEVENT:STRING=bundled
+WITH_LIBWRAP:BOOL=OFF
+WITH_LZ4:STRING=bundled
+WITH_MECAB:STRING=
+WITH_MSAN:BOOL=OFF
+WITH_NGRAM_PARSER:BOOL=ON
+WITH_NUMA:BOOL=OFF
+WITH_PARTITION_STORAGE_ENGINE:BOOL=ON
+WITH_PIC:BOOL=ON
+WITH_RAPID:BOOL=ON
+WITH_SSL:STRING=bundled
+WITH_TEST_TRACE_PLUGIN:BOOL=OFF
+WITH_UBSAN:BOOL=OFF
+WITH_UNIT_TESTS:BOOL=ON
+WITH_VALGRIND:BOOL=OFF
+WITH_ZLIB:STRING=bundled
+XPLUGIN_LOG_PROTOBUF:STRING=1
+
+===== EOF =====

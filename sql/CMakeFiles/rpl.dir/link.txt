@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc librpl.a  CMakeFiles/rpl.dir/rpl_handler.cc.o CMakeFiles/rpl.dir/rpl_tblmap.cc.o CMakeFiles/rpl.dir/rpl_context.cc.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib librpl.a
