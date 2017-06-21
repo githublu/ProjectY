@@ -1171,24 +1171,34 @@ void createPythonProcess(char* query)
 {
 
   sql_print_information("Enter createPythonProcess");
-  pid_t processId;
-  if ((processId = fork()) == 0) {
-      char app[] = "/usr/bin/python";
-      char * const argv[] = { app,"/Users/yilu/Projects/mysql-server/python/testPy.py", query, NULL };
-      char * const envp[] = { NULL };
-      if (execve(app, argv, envp) < 0) {
-          sql_print_error("Cannot create Process");
-      }
-      else
-      {
-        sql_print_information("successfully create process");
-      }
-  } else if (processId < 0) {
-      sql_print_error("Cannot fork Process");
-  } else {
-      sql_print_information("process no ops");
+
+  char program[] = "python ";
+  char scriptPath[] = "/Users/yilu/Projects/mysql-server/python/StaticPredict.py ";
+  
+  int execLength = sizeof(program) + sizeof(scriptPath) + sizeof(query);
+  char exec[execLength + 1];
+  memcpy(exec, program, sizeof(program));
+  strncat(exec, scriptPath, sizeof(exec) - strlen(exec) - 1);
+  strncat(exec, query, sizeof(exec) - strlen(exec) - 1);
+
+  FILE *fp;
+  int status;
+  char output[100];
+
+  fp = popen(exec, "r");
+  if(fp == NULL)
+  {
+    sql_print_error("empty output stream");
   }
-  sql_print_information("Exit createPythonProcess");
+
+  while (fgets(output, 100, fp) != NULL)
+  {
+    sql_print_information("%s\n", output);
+  }
+
+  status = pclose(fp);
+
+  sql_print_information("Exit createPythonProcess with status %d", status);
 
 }
 
@@ -1220,6 +1230,7 @@ void predictWritter(const COM_DATA *com_data, const char* filePath)
         // std::ofstream outputFile;
         // outputFile.open(filePath);
         // outputFile<<str<<std::endl;
+        sql_print_information("before creating python prcess");
         createPythonProcess(str);
         //outputFile.close();
         sql_print_information("query is written: %s", str);
