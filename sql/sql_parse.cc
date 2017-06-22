@@ -1167,7 +1167,7 @@ void reset_statement_timer(THD *thd)
 }
 
 #ifdef YY
-void createPythonProcess(char* query)
+char* createPythonProcess(char* query)
 {
 
   sql_print_information("Enter createPythonProcess");
@@ -1183,7 +1183,7 @@ void createPythonProcess(char* query)
 
   FILE *fp;
   int status;
-  char output[100];
+  char output[52];
 
   fp = popen(exec, "r");
   if(fp == NULL)
@@ -1191,19 +1191,23 @@ void createPythonProcess(char* query)
     sql_print_error("empty output stream");
   }
 
-  while (fgets(output, 100, fp) != NULL)
+  if (fgets(output, sizeof(output), fp) != NULL)
   {
     sql_print_information("%s\n", output);
   }
 
   status = pclose(fp);
+  output[51] = '\0';
 
   sql_print_information("Exit createPythonProcess with status %d", status);
-
+  return output;
 }
 
 void predictWritter(const COM_DATA *com_data, const char* filePath)
 {
+
+  COM_DATA* com_data_alias = const_cast<COM_DATA*>(com_data);
+
   int maxlen = system_charset_info->mbmaxlen;
   unsigned long length = com_data->com_query.length;
   size_t new_length= maxlen * length;
@@ -1223,6 +1227,7 @@ void predictWritter(const COM_DATA *com_data, const char* filePath)
       queryHead[counter] = tolower(c);
     }
 
+    char *output;
     if (strcmp(queryHead, "predict") == 0)
     {
         memcpy(str, com_data->com_query.query, new_length);
@@ -1231,9 +1236,12 @@ void predictWritter(const COM_DATA *com_data, const char* filePath)
         // outputFile.open(filePath);
         // outputFile<<str<<std::endl;
         sql_print_information("before creating python prcess");
-        createPythonProcess(str);
+        output = createPythonProcess(str);
         //outputFile.close();
-        sql_print_information("query is written: %s", str);
+        sql_print_information("query is written: %s", output);
+
+        com_data_alias->com_query.query = output;
+        com_data_alias->com_query.length = 51;
     }
   }
 }

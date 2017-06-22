@@ -1361,6 +1361,7 @@
 /Users/yilu/mysql-bin/5.7/bin/mysqldumpslow
 /Users/yilu/mysql-bin/5.7/bin/mysqld_multi
 /Users/yilu/mysql-bin/5.7/bin/mysqld_safe
+/Users/yilu/mysql-bin/5.7/mysql-test/./.DS_Store
 /Users/yilu/mysql-bin/5.7/mysql-test/./asan.supp
 /Users/yilu/mysql-bin/5.7/mysql-test/./collections/coverage.ignore
 /Users/yilu/mysql-bin/5.7/mysql-test/./collections/default.daily
@@ -3412,6 +3413,7 @@
 /Users/yilu/mysql-bin/5.7/mysql-test/./std_data/wl7957_1.MYI
 /Users/yilu/mysql-bin/5.7/mysql-test/./std_data/words.dat
 /Users/yilu/mysql-bin/5.7/mysql-test/./std_data/words2.dat
+/Users/yilu/mysql-bin/5.7/mysql-test/./suite/.DS_Store
 /Users/yilu/mysql-bin/5.7/mysql-test/./suite/auth_sec/include/have_openssl.inc
 /Users/yilu/mysql-bin/5.7/mysql-test/./suite/auth_sec/include/have_sha256_rsa_auth.inc
 /Users/yilu/mysql-bin/5.7/mysql-test/./suite/auth_sec/include/have_ssl.inc
