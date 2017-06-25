@@ -69,8 +69,8 @@ ExecQuery(dbConnection, createTableQuery)
 insertResultQuery = "INSERT INTO " + tableName + " VALUES ('" + str(clf.predict(feature)[0]) + "', " + str(score) + ");"
 ExecQuery(dbConnection, insertResultQuery)
 
-## select query command
-selectResutlQuery = "SELECT * FROM " + tableName + ";"
+# select query command
+selectResutlQuery = "select * from " + tableName
 
 print(selectResutlQuery)
 

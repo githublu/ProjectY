@@ -1183,7 +1183,7 @@ char* createPythonProcess(char* query)
 
   FILE *fp;
   int status;
-  char output[52];
+  char *output = new char[51]; 
 
   fp = popen(exec, "r");
   if(fp == NULL)
@@ -1191,13 +1191,12 @@ char* createPythonProcess(char* query)
     sql_print_error("empty output stream");
   }
 
-  if (fgets(output, sizeof(output), fp) != NULL)
+  if (fgets(output, 51, fp) != NULL)
   {
-    sql_print_information("%s\n", output);
+    //sql_print_information("%s\n", output);
   }
 
   status = pclose(fp);
-  output[51] = '\0';
 
   sql_print_information("Exit createPythonProcess with status %d", status);
   return output;
@@ -1210,14 +1209,15 @@ void predictWritter(const COM_DATA *com_data, const char* filePath)
 
   int maxlen = system_charset_info->mbmaxlen;
   unsigned long length = com_data->com_query.length;
+  
   size_t new_length= maxlen * length;
 
   char str[new_length+1];
   if (new_length > 7)
   {
-    char queryHead[8];
-    memcpy(queryHead, com_data->com_query.query, 7);
-    queryHead[7] = 0;
+    char queryHead[9];
+    memcpy(queryHead, com_data->com_query.query, 8);
+    queryHead[8] = 0;
 
     int counter = 0;
     char c;
@@ -1228,20 +1228,17 @@ void predictWritter(const COM_DATA *com_data, const char* filePath)
     }
 
     char *output;
-    if (strcmp(queryHead, "predict") == 0)
+    if (strcmp(queryHead, "predict ") == 0)
     {
         memcpy(str, com_data->com_query.query, new_length);
         str[new_length] = 0;
-        // std::ofstream outputFile;
-        // outputFile.open(filePath);
-        // outputFile<<str<<std::endl;
         sql_print_information("before creating python prcess");
         output = createPythonProcess(str);
-        //outputFile.close();
-        sql_print_information("query is written: %s", output);
 
         com_data_alias->com_query.query = output;
-        com_data_alias->com_query.length = 51;
+        com_data_alias->com_query.length = 50;
+        output = nullptr;
+        
     }
   }
 }

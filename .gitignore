@@ -3120,3 +3120,6 @@ client/mysql_ssl_rsa_setup
 
 # Allow
 !include/*/boost/geometry/*
+
+# mac specific files
+.DS_Store
