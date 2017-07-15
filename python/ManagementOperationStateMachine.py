@@ -86,7 +86,7 @@ def ProblemParsing():
 def ModelSelection():
     global actionOutcome, currentModel, currentModelParameter, currentModelIndex
     log_debug("doing ModelSelection")
-    currentModel = modelManager.NextModel()
+    currentModel = modelManager.next_model()
     if currentModel is None:
         actionOutcome = "Prediction"
         return
@@ -105,9 +105,6 @@ def DataTuningAndPreprocessing():
     log_debug("doing preprocessing")
     for X, y in totalDataset:
         sourceDataset = X
-        if currentModelIndex == 1 and typeOfProblem == "regression":
-            ploy3 = PolynomialFeatures(degree=3)
-            ploy3.fit_transform(sourceDataset)
 
         # sourceDataset = StandardScaler().fit_transform(sourceDataset)
         targetSet = y

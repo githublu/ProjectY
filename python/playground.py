@@ -13,5 +13,11 @@ from sklearn import datasets
 from sklearn.metrics import classification_report,confusion_matrix
 
 
-dic = ["svm", "MLPClassifier", "GLR"]
-print(dic[4])
+class P:
+
+    def __init__(self,x):
+        self.__x = x
+
+
+p1 = P(123)
+print(p1.x)

@@ -12,11 +12,11 @@ class ClassificationModelManager(ModelManager):
         super().__init__()
         self.modelList = ["MLPClassifier"]
 
-    def NextModel(self):
+    def next_model(self):
         self.SetModelIndex(self.modelIndex + 1)
         return self.GetModel(self.modelIndex, self.modelParameter)
 
-    def GetModel(self, model, parameters):
+    def get_model(self, model, parameters):
         try:
             if self.modelList[model] == "MLPClassifier":
                 return MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(100, 100, 100, 100), random_state=1)

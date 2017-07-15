@@ -1,16 +1,27 @@
+import abc
+from Logger.logger import *
 
-class Model:
-    type = ""
-    model = None
+class Model(object):
+    @abc.abstractmethod
     def __init__(self):
-        self.type = ""
-        self.model = None
+        return
 
+    @abc.abstractmethod
+    def set_parameter(self, parameters):
+        return
+
+    @abc.abstractmethod
     def fit(self, trainingSet, testingSet):
-        return self.model.fit(trainingSet, testingSet)
+        return
 
+    @abc.abstractmethod
     def predict(self, input):
-        return self.model.predict(input)
+        return
 
+    @abc.abstractmethod
     def score(self, sourceTestSet, targetTestSet):
-        return self.model(sourceTestSet, targetTestSet)
+        return
+
+    @abc.abstractmethod
+    def preprocessing(self, sourceTestSet, targetTestSet):
+        return

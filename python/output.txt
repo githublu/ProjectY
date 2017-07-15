@@ -1,1 +1,0 @@
-2017-06-15 21:08:35.0833522017-06-15 21:08:55.779045['/Users/yilu/Projects/mysql-server/python/testPy.py', 'predict select * from t1']2017-06-15 21:10:47.587316['/Users/yilu/Projects/mysql-server/python/testPy.py', 'predict select * from t1']2017-06-21 21:22:20.991518['testPy.py']

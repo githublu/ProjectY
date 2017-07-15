@@ -8,23 +8,30 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression
 from Models.ModelManager import ModelManager
+from Models.SVMModel import *
+from Models.PerceptronModel import *
+from Models.GLRModel import *
 
 
 class RegressionModelManager(ModelManager):
 
     def __init__(self):
         super().__init__()
-        self.modelList = ["svm", "GLR"]
+        self.modelList = ["SVMModel", "GLR", "PerceptionModel"]
 
-    def NextModel(self):
+    def next_model(self):
         self.SetModelIndex(self.modelIndex + 1)
         return self.GetModel(self.modelIndex, self.modelParameter)
 
-    def GetModel(self, model, parameters):
+    def get_model(self, model, parameters):
         try:
-            if self.modelList[model] == "svm":
-                return svm.SVR()
+            if self.modelList[model] == "SVMModel":
+                return SVMModel(parameters)
             elif self.modelList[model] == "GLR":
-                return Pipeline([('poly', PolynomialFeatures(degree=parameters)),('linear', LinearRegression(fit_intercept=False))])
+                return GLRModel(parameters)
+            elif self.modelList[model] == "PerceptionModel":
+                return PerceptronModel(parameters)
         except IndexError:
             return None
+        except ValueError as error:
+            log_warning(repr(error))
