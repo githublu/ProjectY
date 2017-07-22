@@ -16,21 +16,21 @@ from Models.GLRModel import *
 class RegressionModelManager(ModelManager):
 
     def __init__(self):
-        super().__init__()
-        self.modelList = ["SVMModel", "GLR", "PerceptionModel"]
+        ModelManager.__init__(self)
+        self.modelList = ["GLR", "SVMModel", "PerceptionModel"]
 
     def next_model(self):
         self.SetModelIndex(self.modelIndex + 1)
-        return self.GetModel(self.modelIndex, self.modelParameter)
+        return self.get_model(self.modelIndex)
 
-    def get_model(self, model, parameters):
+    def get_model(self, model):
         try:
             if self.modelList[model] == "SVMModel":
-                return SVMModel(parameters)
+                return SVMModel()
             elif self.modelList[model] == "GLR":
-                return GLRModel(parameters)
+                return GLRModel()
             elif self.modelList[model] == "PerceptionModel":
-                return PerceptronModel(parameters)
+                return PerceptronModel()
         except IndexError:
             return None
         except ValueError as error:

@@ -26,5 +26,10 @@ class PerceptronModel(Model):
     def score(self, sourceTestSet, targetTestSet):
         return self.model.score(sourceTestSet, targetTestSet)
 
-    def preprocessing(self, sourceTestSet, targetTestSet):
+    def preprocessing(self, dataset):
+        return dataset
+
+    def tune(self):
+        self.parameters["n_iter"] += 1
+        self.model = Perceptron(n_iter=self.parameters["n_iter"])
         return

@@ -2,6 +2,9 @@ import abc
 from Logger.logger import *
 
 class Model(object):
+
+    model = None
+
     @abc.abstractmethod
     def __init__(self):
         return
@@ -23,5 +26,9 @@ class Model(object):
         return
 
     @abc.abstractmethod
-    def preprocessing(self, sourceTestSet, targetTestSet):
+    def preprocessing(self, dataset):
+        return
+
+    @abc.abstractmethod
+    def tune(self):
         return

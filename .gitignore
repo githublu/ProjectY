@@ -3123,3 +3123,7 @@ client/mysql_ssl_rsa_setup
 
 # mac specific files
 .DS_Store
+
+#local pycham files
+python/.idea/*
+*.pyc

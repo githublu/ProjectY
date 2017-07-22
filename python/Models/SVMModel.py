@@ -17,5 +17,8 @@ class SVMModel(Model):
     def score(self, sourceTestSet, targetTestSet):
         return self.model.score(sourceTestSet, targetTestSet)
 
-    def preprocessing(self, sourceTestSet, targetTestSet):
+    def preprocessing(self, dataset):
+        return dataset
+
+    def tune(self):
         return

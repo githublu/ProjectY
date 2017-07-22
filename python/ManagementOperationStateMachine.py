@@ -74,7 +74,7 @@ def ProblemParsing():
     typeOfProblem = GetProblemType(dataTypeQuery, targetName).type
     if typeOfProblem == "regression":
         modelManager = RegressionModelManager()
-    elif typeOfProblem  == "classification":
+    elif typeOfProblem == "classification":
         modelManager = ClassificationModelManager()
 
     actionOutcome = "ModelSelection"
@@ -87,30 +87,42 @@ def ModelSelection():
     global actionOutcome, currentModel, currentModelParameter, currentModelIndex
     log_debug("doing ModelSelection")
     currentModel = modelManager.next_model()
-    if currentModel is None:
+
+    # for the last model, go to prediction only
+    if currentModel is None and currentBestModel is not None:
         actionOutcome = "Prediction"
         return
 
-    #currentModel = regressionModelManager.GetModel(1, 3)
     currentModelIndex = modelManager.GetModelIndex()
-    currentModelParameter = modelManager.GetModelParameter()
     log_info("current model index %s" % currentModelIndex)
-    actionOutcome = "DataTuningAndPreprocessing"
+
+    # first time for this new model
+    actionOutcome = "DataPreprocessing"
+
     return
 
-
 # Preprocess dataset to certain transformation to be better fit
-def DataTuningAndPreprocessing():
+def DataPreprocessing():
     global actionOutcome, sourceDataset, targetSet, sourceTrainingSet, targetTrainingSet, sourceTestSet, targetTestSet
     log_debug("doing preprocessing")
     for X, y in totalDataset:
-        sourceDataset = X
+        sourceDataset = currentModel.preprocessing(X)
 
         # sourceDataset = StandardScaler().fit_transform(sourceDataset)
-        targetSet = y
+        targetSet = currentModel.preprocessing(y)
+
         sourceTrainingSet, sourceTestSet, targetTrainingSet, targetTestSet = train_test_split(X, y, test_size=.3)
+
+    # skip tuning and use the default parameters
     actionOutcome = "ModelTraining"
     return
+
+def DataTuning():
+    global actionOutcome, sourceDataset, targetSet, sourceTrainingSet, targetTrainingSet, sourceTestSet, targetTestSet
+    currentModel.tune()
+    actionOutcome = "ModelTraining"
+    return
+
 
 # Run source dataset to train model
 def ModelTraining():
@@ -131,10 +143,10 @@ def ModelTestingAndComparison():
         currentBestScore = score
         currentBestModel = currentModel
 
-    if score >= 0.5:
+    if score >= 0.7:
         actionOutcome = "Prediction"
     elif score >= 0.2:
-        actionOutcome = "DataTuningAndPreprocessing"
+        actionOutcome = "DataTuning"
     else:
         actionOutcome = "ModelSelection"
     return
@@ -157,7 +169,8 @@ FSMStates = {
     "ProblemParsing": ProblemParsing,
     "DataInjestion": DataInjestion,
     "ModelSelection": ModelSelection,
-    "DataTuningAndPreprocessing": DataTuningAndPreprocessing,
+    "DataPreprocessing": DataPreprocessing,
+    "DataTuning": DataTuning,
     "ModelTraining": ModelTraining,
     "ModelTestingAndComparison": ModelTestingAndComparison,
     "Prediction": Prediction
@@ -170,11 +183,11 @@ FSMStableStates = FSMFailureStableState + FSMSuccessStableState
 
 # # main entry point
 ## example of using MLPClassifier
-#EntryPoint("select * from iris;", [5.9, 3, 5.1, 1.8], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
-EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
-           "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
-           "violent crime"
-           )
+EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", [5.9, 3, 5.1], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
+#EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
+           # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
+           # "violent crime"
+           # )
 while actionOutcome not in FSMStableStates:
     log_debug(actionOutcome)
     FSMStates[actionOutcome]()

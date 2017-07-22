@@ -2,7 +2,6 @@ import abc
 
 class ModelManager:
 
-    @abc.abstractmethod
     def __init__(self):
         self.modelIndex = -1
         self.modelParameter = {}
@@ -14,10 +13,6 @@ class ModelManager:
         return self.modelIndex
 
 
-    def GetModelParameter(self):
-        return self.modelParameter
-
-
     def SetModelIndex(self, index):
         self.modelIndex = index
 
@@ -26,5 +21,5 @@ class ModelManager:
         return
 
     @abc.abstractmethod
-    def get_model(self, model, parameters):
+    def get_model(self, model):
         return

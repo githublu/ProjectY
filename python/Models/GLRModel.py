@@ -28,5 +28,11 @@ class GLRModel(Model):
     def score(self, sourceTestSet, targetTestSet):
         return self.model.score(sourceTestSet, targetTestSet)
 
-    def preprocessing(self, sourceTestSet, targetTestSet):
+    def preprocessing(self, dataset):
+        return dataset
+
+    def tune(self):
+        self.parameter["degree"] += 1
+        self.model = Pipeline([('poly', PolynomialFeatures(degree=self.parameter["degree"])),
+                               ('linear', LinearRegression(fit_intercept=False))])
         return
