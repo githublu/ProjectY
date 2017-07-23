@@ -7,7 +7,7 @@ from Models.Model import *
 class GLRModel(Model):
     initialParameter = {"degree": 3}
 
-    def __init__(self):
+    def __init__(self, parameters):
         self.parameter = self.initialParameter
         self.model = Pipeline([('poly', PolynomialFeatures(degree=self.initialParameter["degree"])),('linear', LinearRegression(fit_intercept=False))])
 

@@ -1,0 +1,17 @@
+{
+  "modelList": [
+    "SVMModel",
+    "GLR",
+    "PerceptionModel"
+  ],
+  "InitialParameters": {
+    "SVMModel": "",
+    "GLR": {
+      "degrees": "3",
+      "fit_intercept": "False"
+    },
+    "PerceptionModel": {
+      "n_iter": "3"
+    }
+  }
+}

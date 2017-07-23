@@ -6,7 +6,7 @@ class PerceptronModel(Model):
 
     initialParameter = {"n_iter": 3}
 
-    def __init__(self):
+    def __init__(self, parameters):
         self.parameters = self.initialParameter
         self.model = Perceptron(n_iter=self.initialParameter["n_iter"])
 
