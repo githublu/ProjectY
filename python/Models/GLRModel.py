@@ -8,9 +8,8 @@ class GLRModel(Model):
     initialParameter = {"degree": 3}
 
     def __init__(self, parameters):
-        self.parameter = self.initialParameter
+        self.parameter = parameters
         self.model = Pipeline([('poly', PolynomialFeatures(degree=self.initialParameter["degree"])),('linear', LinearRegression(fit_intercept=False))])
-
 
     def set_parameter(self, parameter):
         self.parameter = parameter
@@ -32,7 +31,7 @@ class GLRModel(Model):
         return dataset
 
     def tune(self):
-        self.parameter["degree"] += 1
-        self.model = Pipeline([('poly', PolynomialFeatures(degree=self.parameter["degree"])),
+        self.parameter["degrees"] += 1
+        self.model = Pipeline([('poly', PolynomialFeatures(degree=self.parameter["degrees"])),
                                ('linear', LinearRegression(fit_intercept=False))])
         return

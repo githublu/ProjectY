@@ -8,6 +8,9 @@ class SVMModel(Model):
         self.parameter = parameter
         self.model = svm.SVR()
 
+    def set_parameter(self, parameters):
+        return
+
     def fit(self, trainingSet, testingSet):
         return self.model.fit(trainingSet, testingSet)
 

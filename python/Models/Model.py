@@ -4,6 +4,7 @@ from Logger.logger import *
 class Model(object):
 
     model = None
+    parameter = []
 
     @abc.abstractmethod
     def __init__(self):
@@ -12,6 +13,9 @@ class Model(object):
     @abc.abstractmethod
     def set_parameter(self, parameters):
         return
+
+    def get_parameter(self):
+        return self.parameter
 
     @abc.abstractmethod
     def fit(self, trainingSet, testingSet):

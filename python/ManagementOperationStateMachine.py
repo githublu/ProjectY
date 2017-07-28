@@ -98,7 +98,6 @@ def ModelSelection():
 
     # first time for this new model
     actionOutcome = "DataPreprocessing"
-
     return
 
 # Preprocess dataset to certain transformation to be better fit
@@ -114,11 +113,12 @@ def DataPreprocessing():
         sourceTrainingSet, sourceTestSet, targetTrainingSet, targetTestSet = train_test_split(X, y, test_size=.3)
 
     # skip tuning and use the default parameters
-    actionOutcome = "ModelTraining"
+    actionOutcome = "DataTuning"
     return
 
 def DataTuning():
     global actionOutcome, sourceDataset, targetSet, sourceTrainingSet, targetTrainingSet, sourceTestSet, targetTestSet
+    param = currentModel.get_parameter()
     currentModel.tune()
     actionOutcome = "ModelTraining"
     return
