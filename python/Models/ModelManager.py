@@ -21,5 +21,5 @@ class ModelManager:
         return
 
     @abc.abstractmethod
-    def get_model(self, model):
+    def get_model(self, model, parameters):
         return

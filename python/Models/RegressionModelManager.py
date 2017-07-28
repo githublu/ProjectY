@@ -1,12 +1,4 @@
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.neural_network import MLPClassifier
-import numpy as np
-from sklearn import svm
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LinearRegression
 from Models.ModelManager import ModelManager
 from Models.SVMModel import *
 from Models.PerceptronModel import *
@@ -18,6 +10,8 @@ class RegressionModelManager(ModelManager):
 
     def __init__(self):
         ModelManager.__init__(self)
+        # D:\Projects\ProjectY\python\ModelConfig\model.json
+        # /Users/yilu/Projects/mysql-server/python/ModelConfig/model.json
         with open('D:\Projects\ProjectY\python\ModelConfig\model.json') as model_config_file:
             self.model_config = json.load(model_config_file)
 

@@ -11,6 +11,7 @@ from Models.RegressionModelManager import *
 from Models.ClassificationModelManager import *
 from Logger.logger import *
 from ProblemParser import *
+from ModelTuningManager import *
 from sklearn import svm
 
 actionOutcome = ""
@@ -35,6 +36,7 @@ currentModelParameter = 0
 tunningCounter = 0
 modelManager = None
 typeOfProblem = ""
+score = -1
 
 def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName):
     global actionOutcome, selectQuery, modelInput, dataTypeQuery, targetName
@@ -76,13 +78,16 @@ def ProblemParsing():
         modelManager = RegressionModelManager()
     elif typeOfProblem == "classification":
         modelManager = ClassificationModelManager()
+    else:
+        actionOutcome = "InvalidProblemType"
+        return
 
     actionOutcome = "ModelSelection"
     return
 
 
-# Select a range to best model for this problem
-# Decide whether keep tuning current model or switch to next model
+# Invoke the current model manager to get the next model
+# This will always give you a new model
 def ModelSelection():
     global actionOutcome, currentModel, currentModelParameter, currentModelIndex
     log_debug("doing ModelSelection")
@@ -100,14 +105,14 @@ def ModelSelection():
     actionOutcome = "DataPreprocessing"
     return
 
-# Preprocess dataset to certain transformation to be better fit
+# Only preprocess the data once for each new model
+# Include splitting dataset into train set and test set
+# Call model's function for specific preprocessing
 def DataPreprocessing():
     global actionOutcome, sourceDataset, targetSet, sourceTrainingSet, targetTrainingSet, sourceTestSet, targetTestSet
     log_debug("doing preprocessing")
     for X, y in totalDataset:
         sourceDataset = currentModel.preprocessing(X)
-
-        # sourceDataset = StandardScaler().fit_transform(sourceDataset)
         targetSet = currentModel.preprocessing(y)
 
         sourceTrainingSet, sourceTestSet, targetTrainingSet, targetTestSet = train_test_split(X, y, test_size=.3)
@@ -116,9 +121,14 @@ def DataPreprocessing():
     actionOutcome = "DataTuning"
     return
 
+# After the first initial parameter prediction, this state determines how should it proceed further
+# This is the only state determines if we should keep tuning or choose a new model
 def DataTuning():
     global actionOutcome, sourceDataset, targetSet, sourceTrainingSet, targetTrainingSet, sourceTestSet, targetTestSet
     param = currentModel.get_parameter()
+    # mtm = ModelTuningManager()
+    # mtm.add_history()
+
     currentModel.tune()
     actionOutcome = "ModelTraining"
     return
@@ -133,9 +143,10 @@ def ModelTraining():
     return
 
 # Compare this model with current best model
-# Determine if we want to tune current model or try next one
+# Determine if we want to this model is good enough
+# Always go back to DataTuning state to determine next step if current model with current parameter is not good enough
 def ModelTestingAndComparison():
-    global actionOutcome, currentBestScore, currentBestModel
+    global actionOutcome, currentBestScore, currentBestModel, score
     log_debug("doing ModelTestingAndComparison")
     score = currentModel.score(sourceTestSet, targetTestSet)
     log_debug("current score is %s" % score)
@@ -145,10 +156,8 @@ def ModelTestingAndComparison():
 
     if score >= 0.7:
         actionOutcome = "Prediction"
-    elif score >= 0.2:
-        actionOutcome = "DataTuning"
     else:
-        actionOutcome = "ModelSelection"
+        actionOutcome = "DataTuning"
     return
 
 # Once the best model is found, make prediction and return
@@ -177,7 +186,7 @@ FSMStates = {
 }
 
 FSMSuccessStableState = ["Prediction"]
-FSMFailureStableState = ["NotAccurate", "FailedPreconditionCheck"]
+FSMFailureStableState = ["NotAccurate", "FailedPreconditionCheck", "InvalidProblemType"]
 FSMStableStates = FSMFailureStableState + FSMSuccessStableState
 
 
