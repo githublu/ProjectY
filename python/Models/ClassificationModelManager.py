@@ -16,7 +16,7 @@ class ClassificationModelManager(ModelManager):
         self.SetModelIndex(self.modelIndex + 1)
         return self.get_model(self.modelIndex)
 
-    def get_model(self, model):
+    def get_model(self, model, parameters):
         try:
             if self.modelList[model] == "MLPClassifier":
                 return MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(100, 100, 100, 100), random_state=1)

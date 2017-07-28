@@ -11,7 +11,6 @@ class GLRModel(Model):
         self.parameter = self.initialParameter
         self.model = Pipeline([('poly', PolynomialFeatures(degree=self.initialParameter["degree"])),('linear', LinearRegression(fit_intercept=False))])
 
-
     def set_parameter(self, parameter):
         self.parameter = parameter
         try:
