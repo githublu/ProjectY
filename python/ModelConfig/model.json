@@ -1,17 +1,25 @@
 {
-  "ModelList": [
-    "GLR",
-    "SVMModel",
-    "PerceptionModel"
-  ],
-  "InitialParameters": {
-    "SVMModel": "",
-    "GLR": {
-      "degrees": "3",
-      "fit_intercept": "False"
-    },
-    "PerceptionModel": {
-      "n_iter": "3"
+  "Regression": {
+    "ModelList": [
+      "SVMModel",
+      "GLR"
+    ],
+    "InitialParameters": {
+      "SVMModel": "",
+      "GLR": {
+        "degree": 3,
+        "fit_intercept": "False"
+      }
+    }
+  },
+  "Classification": {
+    "ModelList": [
+      "PerceptionModel"
+    ],
+    "InitialParameters": {
+      "PerceptionModel": {
+        "n_iter": 3
+      }
     }
   }
 }

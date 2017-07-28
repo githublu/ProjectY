@@ -9,11 +9,11 @@ class ModelManager:
         return
 
 
-    def GetModelIndex(self):
+    def get_model_index(self):
         return self.modelIndex
 
 
-    def SetModelIndex(self, index):
+    def set_model_index(self, index):
         self.modelIndex = index
 
     @abc.abstractmethod

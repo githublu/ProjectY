@@ -5,16 +5,15 @@ from Models.Model import *
 
 
 class GLRModel(Model):
-    initialParameter = {"degree": 3}
 
     def __init__(self, parameters):
         self.parameter = parameters
-        self.model = Pipeline([('poly', PolynomialFeatures(degree=self.initialParameter["degree"])),('linear', LinearRegression(fit_intercept=False))])
+        self.model = Pipeline([('poly', PolynomialFeatures(degree=self.parameter["degree"])),('linear', LinearRegression(fit_intercept=False))])
 
     def set_parameter(self, parameter):
         self.parameter = parameter
         try:
-            self.model = Pipeline([('poly', PolynomialFeatures(degree=parameter["degree"])),('linear', LinearRegression(fit_intercept=False))])
+            self.model = Pipeline([('poly', PolynomialFeatures(degree=parameter["degree"])), ('linear', LinearRegression(fit_intercept=False))])
         except IndexError:
             log_error("parameter degree does not exit")
 

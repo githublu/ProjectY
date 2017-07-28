@@ -14,6 +14,7 @@ class Model(object):
     def set_parameter(self, parameters):
         return
 
+    @abc.abstractmethod
     def get_parameter(self):
         return self.parameter
 

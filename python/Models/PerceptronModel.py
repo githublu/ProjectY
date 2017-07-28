@@ -1,5 +1,6 @@
 from sklearn.linear_model import Perceptron
 from Models.Model import *
+import numpy as np
 
 
 class PerceptronModel(Model):
@@ -8,7 +9,7 @@ class PerceptronModel(Model):
 
     def __init__(self, parameters):
         self.parameter = parameters
-        self.model = Perceptron(n_iter=self.initialParameter["n_iter"])
+        self.model = Perceptron(n_iter=self.parameter["n_iter"])
 
     def set_parameter(self, parameters):
         self.parameter = parameters
@@ -18,8 +19,8 @@ class PerceptronModel(Model):
             raise ValueError("parameter %s does not exit" % "n_iter")
 
 
-    def fit(self, trainingSet, testingSet):
-        return self.model.fit(trainingSet, testingSet)
+    def fit(self, source_training_set, starget_training_set):
+        return self.model.fit(source_training_set, np.asanyarray(starget_training_set))
 
     def predict(self, input):
         return self.model.predict(input)

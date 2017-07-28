@@ -12,5 +12,6 @@ from sklearn import datasets
 
 from sklearn.metrics import classification_report,confusion_matrix
 import sys,os
-path = sys.path.append(os.path.realpath('..'))
-print(path)
+history = {0: {}}
+history[0][0] = [1, 2]
+print(history)

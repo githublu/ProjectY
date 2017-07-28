@@ -33,10 +33,12 @@ currentBestScore = -1
 modelInput = []
 prediction = []
 currentModelParameter = 0
-tunningCounter = 0
 modelManager = None
+modelTuningManager = None
 typeOfProblem = ""
 score = -1
+totalCounter = 0
+
 
 def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName):
     global actionOutcome, selectQuery, modelInput, dataTypeQuery, targetName
@@ -48,6 +50,7 @@ def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName):
 
     actionOutcome = "PrecondictionCheck"
     return
+
 
 def PrecondictionCheck():
     global actionOutcome
@@ -72,7 +75,7 @@ def DataInjestion():
 # Regression or classification
 # Prediction or abnormality detection
 def ProblemParsing():
-    global actionOutcome, modelManager, typeOfProblem
+    global actionOutcome, modelManager, typeOfProblem, modelTuningManager
     typeOfProblem = GetProblemType(dataTypeQuery, targetName).type
     if typeOfProblem == "regression":
         modelManager = RegressionModelManager()
@@ -82,6 +85,7 @@ def ProblemParsing():
         actionOutcome = "InvalidProblemType"
         return
 
+    modelTuningManager = ModelTuningManager()
     actionOutcome = "ModelSelection"
     return
 
@@ -98,7 +102,7 @@ def ModelSelection():
         actionOutcome = "Prediction"
         return
 
-    currentModelIndex = modelManager.GetModelIndex()
+    currentModelIndex = modelManager.get_model_index()
     log_info("current model index %s" % currentModelIndex)
 
     # first time for this new model
@@ -118,25 +122,27 @@ def DataPreprocessing():
         sourceTrainingSet, sourceTestSet, targetTrainingSet, targetTestSet = train_test_split(X, y, test_size=.3)
 
     # skip tuning and use the default parameters
-    actionOutcome = "DataTuning"
+    actionOutcome = "ModelTraining"
     return
 
 # After the first initial parameter prediction, this state determines how should it proceed further
 # This is the only state determines if we should keep tuning or choose a new model
 def DataTuning():
-    global actionOutcome, sourceDataset, targetSet, sourceTrainingSet, targetTrainingSet, sourceTestSet, targetTestSet
-    param = currentModel.get_parameter()
-    # mtm = ModelTuningManager()
-    # mtm.add_history()
+    global actionOutcome, modelTuningManager
 
-    currentModel.tune()
-    actionOutcome = "ModelTraining"
-    return
+    if modelTuningManager.keep_tune():
+        currentModel.tune()
+        actionOutcome = "ModelTraining"
+        return
+    else:
+        actionOutcome = "ModelSelection"
+        return
 
 
 # Run source dataset to train model
 def ModelTraining():
-    global actionOutcome
+    global actionOutcome, totalCounter
+    totalCounter += 1
     log_debug("doing ModelTraining")
     currentModel.fit(sourceTrainingSet, targetTrainingSet)
     actionOutcome = "ModelTestingAndComparison"
@@ -149,12 +155,14 @@ def ModelTestingAndComparison():
     global actionOutcome, currentBestScore, currentBestModel, score
     log_debug("doing ModelTestingAndComparison")
     score = currentModel.score(sourceTestSet, targetTestSet)
+    modelTuningManager.add_history(modelManager.get_model_index(), currentModel.get_parameter(), score)
+
     log_debug("current score is %s" % score)
     if score >= currentBestScore:
         currentBestScore = score
         currentBestModel = currentModel
 
-    if score >= 0.7:
+    if score >= 10 or totalCounter > 5:
         actionOutcome = "Prediction"
     else:
         actionOutcome = "DataTuning"

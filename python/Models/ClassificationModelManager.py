@@ -13,8 +13,8 @@ class ClassificationModelManager(ModelManager):
         self.modelList = ["MLPClassifier"]
 
     def next_model(self):
-        self.SetModelIndex(self.modelIndex + 1)
-        return self.get_model(self.modelIndex)
+        self.set_model_index(self.modelIndex + 1)
+        return self.get_model(self.modelIndex, None)
 
     def get_model(self, model, parameters):
         try:
