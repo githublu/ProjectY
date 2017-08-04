@@ -5,6 +5,7 @@ from Models.Model import *
 class SVMModel(Model):
 
     def __init__(self, parameter):
+        Model.__init__(self, "SVMModel")
         self.parameter = parameter
         self.model = svm.SVR()
 

@@ -99,6 +99,7 @@ def ModelSelection():
 
     # for the last model, go to prediction only
     if currentModel is None and currentBestModel is not None:
+        log_debug("run out of models and go to prediction")
         actionOutcome = "Prediction"
         return
 
@@ -175,6 +176,7 @@ def Prediction():
     if currentBestScore <= 0:
         actionOutcome = "NotAccurate"
     else:
+        log_debug("best model is %s" % currentBestModel.get_model_name())
         prediction = currentBestModel.predict(modelInput)
         log_debug(prediction)
 
@@ -200,7 +202,8 @@ FSMStableStates = FSMFailureStableState + FSMSuccessStableState
 
 # # main entry point
 ## example of using MLPClassifier
-EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", [5.9, 3, 5.1], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
+#EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", [5.9, 3, 5.1], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
+EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", [5.9, 3, 5.1, 1.8], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
 #EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
            # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
            # "violent crime"

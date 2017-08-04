@@ -23,9 +23,9 @@ class RegressionModelManager(ModelManager):
         self.set_model_index(self.modelIndex + 1)
         return self.get_model(self.modelIndex, None)
 
-    def get_model(self, modelIndex, parameters):
+    def get_model(self, model_index, parameters):
         try:
-            model = self.modelList[modelIndex]
+            model = self.modelList[model_index]
             if parameters is None:
                 parameters = self.model_config["InitialParameters"][model]
             if model == "SVMModel":

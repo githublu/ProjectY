@@ -1,8 +1,8 @@
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.neural_network import MLPClassifier
-import numpy as np
 from Models.ModelManager import ModelManager
+from Models.PerceptronModel import *
+from Models.MLPClassifierModel import  *
+import json
 
 
 class ClassificationModelManager(ModelManager):
@@ -10,15 +10,28 @@ class ClassificationModelManager(ModelManager):
 
     def __init__(self):
         ModelManager.__init__(self)
-        self.modelList = ["MLPClassifier"]
+        # D:\Projects\ProjectY\python\ModelConfig\model.json
+        # /Users/yilu/Projects/mysql-server/python/ModelConfig/model.json
+        with open('D:\Projects\ProjectY\python\ModelConfig\model.json') as model_config_file:
+            model_config_all = json.load(model_config_file)
+
+        self.model_config = model_config_all["Classification"]
+        self.modelList = self.model_config["ModelList"]
 
     def next_model(self):
         self.set_model_index(self.modelIndex + 1)
         return self.get_model(self.modelIndex, None)
 
-    def get_model(self, model, parameters):
+    def get_model(self, model_index, parameters):
         try:
-            if self.modelList[model] == "MLPClassifier":
-                return MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(100, 100, 100, 100), random_state=1)
+            model = self.modelList[model_index]
+            if parameters is None:
+                parameters = self.model_config["InitialParameters"][model]
+
+            if model == "PerceptionModel":
+                #return MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(100, 100, 100, 100), random_state=1)
+                return PerceptronModel(parameters)
+            elif model == "MLPClassifierModel":
+                return MLPClassifierModel(parameters)
         except IndexError:
             return None

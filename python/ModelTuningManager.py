@@ -16,6 +16,3 @@ class ModelTuningManager():
 
     def keep_tune(self):
         return False
-
-    def next_parameter(self):
-        return []
