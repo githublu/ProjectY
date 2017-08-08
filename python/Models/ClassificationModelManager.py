@@ -1,7 +1,7 @@
 import numpy as np
 from Models.ModelManager import ModelManager
 from Models.PerceptronModel import *
-from Models.MLPClassifierModel import  *
+from Models.MLPClassifierModel import *
 import json
 
 

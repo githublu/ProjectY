@@ -31,7 +31,7 @@ class GLRModel(Model):
         return dataset
 
     def tune(self):
-        self.parameter["degrees"] += 1
-        self.model = Pipeline([('poly', PolynomialFeatures(degree=self.parameter["degrees"])),
+        self.parameter["degree"] += 1
+        self.model = Pipeline([('poly', PolynomialFeatures(degree=self.parameter["degree"])),
                                ('linear', LinearRegression(fit_intercept=False))])
         return

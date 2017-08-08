@@ -1,13 +1,13 @@
 {
   "Regression": {
     "ModelList": [
-      "SVMModel",
-      "GLR"
+      "GLR",
+      "SVMModel"
     ],
     "InitialParameters": {
       "SVMModel": "",
       "GLR": {
-        "degree": 3,
+        "degree": 1,
         "fit_intercept": "False"
       }
     }
