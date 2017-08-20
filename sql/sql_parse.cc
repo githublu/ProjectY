@@ -1181,7 +1181,7 @@ void reset_statement_timer(THD *thd)
 
 #ifdef YY
 
-int findSplitor(string token, vector<string> splitors)
+int findSplitor(std::string token, std::vector<string> splitors)
 {
 
     for(int j = 0; j < splitors.size(); ++j)
@@ -1194,17 +1194,17 @@ int findSplitor(string token, vector<string> splitors)
     return -1;
 }
 
-void tokenize(const vector<vector<string>> & splitorVecs, vector<string> tokens, vector<int>& numbers, string& tableName,
-                vector<string>& thingsToUseList, string& selectQuery, string& schemaQuery, vector<string>& thingsToPred)
+void tokenize(const std::vector<vector<string>> & splitorVecs, std::vector<string> tokens, std::vector<int>& numbers, std::string& tableName,
+                std::vector<string>& thingsToUseList, std::string& selectQuery, std::string& schemaQuery, std::vector<string>& thingsToPred)
 {
-    string databasename = "'testdb1'";
+    std::string databasename = "'testdb1'";
     // Schema query:
     // SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = '
     // ' and TABLE_SCHEMA = 'testdb1'
     //
     
-    string SchemaQueryPart1 {"SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = '"};
-    string SchemaQueryPart2 {"' and TABLE_SCHEMA = "};
+    std::string SchemaQueryPart1 {"SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = '"};
+    std::string SchemaQueryPart2 {"' and TABLE_SCHEMA = "};
     
     int curSplitorIndex = 0;
     //vector<string> thingsToPred;
@@ -1332,7 +1332,7 @@ void tokenize(const vector<vector<string>> & splitorVecs, vector<string> tokens,
                     return ;
                 }
                 int lastCharOfCurToken = tokens[i].size() - 1;
-                string num;
+                std::string num;
                 if(('0' <= tokens[i][lastCharOfCurToken] && tokens[i][lastCharOfCurToken]  <= '9') ||
                    tokens[i][lastCharOfCurToken] == ';')
                 {
