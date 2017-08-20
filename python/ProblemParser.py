@@ -18,10 +18,14 @@ class ProblemType:
 def GetProblemType(dateTypeQuery, targetName):
     dataTypeTable = ExecQuery(dateTypeQuery)
     dataTypes = {}
+    targetType = ""
     for row in dataTypeTable:
         dataTypes[row[0]] = row[1]
         if row[0] == targetName:
             targetType = row[1]
+
+    if targetType == "":
+        return ProblemType("invalid")
 
     if targetType == "int" or targetType == "decimal" or targetType == "float":
         return ProblemType("regression")
