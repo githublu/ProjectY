@@ -111,6 +111,19 @@
 
 #include "rpl_group_replication.h"
 #include <algorithm>
+
+
+#include "string"
+#include "vector"
+#include "map"
+#include "list"
+#include "unordered_map"
+#include "queue"
+#include "sstream"
+#include "set"
+#include "map"
+#include "vector"
+
 using std::max;
 
 #define YY true
@@ -1167,20 +1180,288 @@ void reset_statement_timer(THD *thd)
 }
 
 #ifdef YY
+
+int findSplitor(string token, vector<string> splitors)
+{
+
+    for(int j = 0; j < splitors.size(); ++j)
+    {
+        if (0 == token.compare(splitors[j]))
+        {
+            return j;
+        }
+    }
+    return -1;
+}
+
+void tokenize(const vector<vector<string>> & splitorVecs, vector<string> tokens, vector<int>& numbers, string& tableName,
+                vector<string>& thingsToUseList, string& selectQuery, string& schemaQuery, vector<string>& thingsToPred)
+{
+    string databasename = "'testdb1'";
+    // Schema query:
+    // SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = '
+    // ' and TABLE_SCHEMA = 'testdb1'
+    //
+    
+    string SchemaQueryPart1 {"SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = '"};
+    string SchemaQueryPart2 {"' and TABLE_SCHEMA = "};
+    
+    int curSplitorIndex = 0;
+    //vector<string> thingsToPred;
+    
+    
+    std::map<string, int> tokenIndexMap;
+    std::set<string> thingsToUse;
+    
+    
+    bool tokenEnd = false;
+    
+    int lastPartCounter = 0;
+    int mapIndex = 0;
+    bool selectSkipped = false;
+    
+    // 1 is select, 0 is table name
+    //
+    int tableMode = -1;
+    
+    for(int i = 0; i < tokens.size(); ++i)
+    {
+        if(0 == curSplitorIndex){
+            if (findSplitor(tokens[i], splitorVecs[curSplitorIndex++]) < 0){
+                cout<<"first token is not defined"<<endl;
+                return;
+            }
+        }
+        else if(1 == curSplitorIndex )
+        {
+            if(findSplitor(tokens[i], splitorVecs[curSplitorIndex]) >= 0)
+            {
+                ++curSplitorIndex;
+            }
+            else
+            {
+                thingsToPred.push_back(tokens[i]);
+            }
+        }
+        else if(2 == curSplitorIndex)
+        {
+            if(findSplitor(tokens[i], splitorVecs[curSplitorIndex]) >= 0)
+            {
+                ++curSplitorIndex;
+            }
+            else
+            {
+                if(tableMode == -1)
+                {
+                    if(tokens[i].compare("select") == 0)
+                    {
+                        tableMode = 1;
+                    }
+                    else
+                    {
+                        tableMode = 0;
+                    }
+                }
+                if(tableMode == 1)
+                {
+                    selectQuery.append(" ").append(tokens[i]);
+                    // Skip select and things after from
+                    //
+                    if(tokens[i].compare("from") == 0)
+                    {
+                        selectSkipped = false;
+                    }
+                    else if(selectSkipped)
+                    {
+                        //cout<< "token actually added: "<< tokens[i]<<" "<<endl;
+                        int lastCharOfCurToken = tokens[i].size() - 1;
+                        if(tokens[i][lastCharOfCurToken] == ',')
+                        {
+                            tokenIndexMap[tokens[i].substr(0, lastCharOfCurToken)] = mapIndex++;
+                        }
+                        else
+                        {
+                            tokenIndexMap[tokens[i]] = mapIndex++;
+                        }
+                    }
+                    else if(tokens[i].compare("select") == 0)
+                    {
+                        selectSkipped = true;
+                    }
+                    else{
+                         tableName = tokens[i];
+                    }
+                }
+                else
+                {
+                    selectQuery.append(" select from ").append(tokens[i]);
+                    tableName = tokens[i];
+                }
+
+            }
+        }
+        else if(3 == curSplitorIndex)
+        {
+            // parse, a = 1, b = 2, c = 3
+            lastPartCounter++;
+            int remainder = lastPartCounter % 3;
+            if(remainder == 1)
+            {
+                thingsToUse.insert(tokens[i]);
+                thingsToUseList.push_back(tokens[i]);
+                //cout<<"trying to look up "<< tokens[i]<<endl;
+                if(tableMode == 1)
+                {
+                    if(tokenIndexMap.find(tokens[i]) == tokenIndexMap.end())
+                    {
+                        cout<<"value not declared for: "<<tokens[i]<<endl;
+                        return ;
+                    }
+                }
+            }
+            else if(remainder == 2)
+            {
+            }
+            else
+            {
+                if(tokenEnd)
+                {
+                    // String ends up with wrong character
+                    //
+                    cout<<"wrong ending"<<endl;
+                    return ;
+                }
+                int lastCharOfCurToken = tokens[i].size() - 1;
+                string num;
+                if(('0' <= tokens[i][lastCharOfCurToken] && tokens[i][lastCharOfCurToken]  <= '9') ||
+                   tokens[i][lastCharOfCurToken] == ';')
+                {
+                    
+                    if(tokens[i][lastCharOfCurToken] == ';')
+                    {
+                        num = tokens[i].substr(0, lastCharOfCurToken);
+                    }
+                    else
+                    {
+                        num = tokens[i].substr(0, 1 + lastCharOfCurToken);
+                    }
+                    tokenEnd = true;
+                }
+                else if(tokens[i][lastCharOfCurToken] == ','){
+                    num = tokens[i].substr(0, lastCharOfCurToken);
+                }
+                int val = atoi(num.c_str());
+                numbers.push_back(val);
+                //cout<<"token[i] "<<tokens[i]<<" lastCharOfCurToken: "<< lastCharOfCurToken <<" num: "<< num<< " c_str: "<< num.c_str()<<" val: "<<val <<endl;
+            }
+        }
+        else{
+            cout<<"three tokens are expected but not found"<<endl;
+            return ;
+        }
+    }
+    
+    int indexOfFrom = selectQuery.find("from");
+    
+    if(tableMode == 1)
+    {
+        for(auto it = tokenIndexMap.begin(); it != tokenIndexMap.end(); ++it)
+        {
+            if (thingsToUse.find(it->first) == thingsToUse.end())
+            {
+                cout<< "defined but not supplied: "<< it->first <<endl;
+                return ;
+            }
+        }
+    }
+    else
+    {
+        for(int i = 0; i < thingsToUseList.size(); ++i)
+        {
+            selectQuery.insert(indexOfFrom++, " ").insert(indexOfFrom, thingsToUseList[i]);
+            indexOfFrom += thingsToUseList[i].length();
+            if(thingsToUseList.size() - 1 != i)
+            {
+                selectQuery.insert(indexOfFrom++, ",");
+            }
+        }
+        
+    }
+
+    for(int i = 0; i < thingsToPred.size(); ++i)
+    {
+        if(0 == i)
+        {
+            selectQuery.insert(indexOfFrom++, ",");
+        }
+        selectQuery.insert(indexOfFrom++, " ").insert(indexOfFrom, thingsToPred[i]);
+        indexOfFrom += thingsToPred[i].length();
+    }
+    selectQuery.insert(indexOfFrom, " ");
+    
+    schemaQuery = SchemaQueryPart1 + tableName + SchemaQueryPart2 + databasename;
+    
+    return ;
+}
+
 char* createPythonProcess(char* query)
 {
 
   sql_print_information("Enter createPythonProcess");
 
-  char program[] = "python ";
-  char scriptPath[] = "/Users/yilu/Projects/mysql-server/python/StaticPredict.py ";
-  
-  int execLength = sizeof(program) + sizeof(scriptPath) + sizeof(query);
+    char program[] = "python ";
+    char scriptPath[] = "/Users/yilu/Projects/mysql-server/python/ManagementOperationStateMachine.py.py ";
+    
+    std::string commandLine;
+    
+    std::vector<string> tokens;
+    
+    std::vector<int> values;
+    std::vector<string> firstSplitorVec = {"predict"};
+    std::vector<string> secondSplitorVec = {"from"};
+    std::vector<string> thirdSplitorVec = {"using"};
+    std::vector<vector<string>> splitorVecs = {firstSplitorVec, secondSplitorVec, thirdSplitorVec};
+    char * pch;
+    pch = strtok (query," \t \n");
+    while (pch != NULL)
+    {
+        //printf ("%s\n",pch);
+        string s(pch);
+        tokens.push_back(s);
+        pch = strtok (NULL, " \t \n");
+    }
+    
+    std::vector<int> numbers;
+    std::string tableName;
+    std::vector<string> usedList;
+    std::vector<string> predList;
+    std::string selectQuery;
+    std::string schemaQuery;
+    
+    tokenize(splitorVecs, tokens, numbers, tableName, usedList, selectQuery, schemaQuery, predList);
+    
+    commandLine.append(program).append(scriptPath).append("\"").append(selectQuery).append("\" ");
+    for(int i = 0; i < numbers.size(); ++i)
+    {
+        commandLine.append(std::to_string(numbers[i]));
+        if(i != numbers.size() - 1)
+        {
+            commandLine.append(",");
+        }
+    }
+    commandLine.append(" \"");
+    commandLine.append(schemaQuery);
+    commandLine.append("\" ");
+    commandLine.append(predList[0]);
+
+    const char *cstr = commandLine.c_str();
+    char* exec = const_cast<char*>(cstr);
+/*  int execLength = sizeof(program) + sizeof(scriptPath) + sizeof(query);
   char exec[execLength + 1];
   memcpy(exec, program, sizeof(program));
   strncat(exec, scriptPath, sizeof(exec) - strlen(exec) - 1);
   strncat(exec, query, sizeof(exec) - strlen(exec) - 1);
-
+*/
   FILE *fp;
   int status;
   char *output = new char[51]; 
