@@ -12,5 +12,8 @@ from sklearn import datasets
 
 from sklearn.metrics import classification_report,confusion_matrix
 import sys,os
-history ='(100,100,100,100)'
-print(history,)
+history = {0: {}}
+if history.__contains__(0):
+    print("hask key")
+else:
+    print("no key")

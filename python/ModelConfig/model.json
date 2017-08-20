@@ -1,28 +1,33 @@
 {
   "Regression": {
     "ModelList": [
-      "GLR",
-      "SVMModel"
+      "SVMModel",
+      "GLR"
     ],
     "InitialParameters": {
       "SVMModel": "",
       "GLR": {
-        "degree": 1,
+        "degree": 3,
         "fit_intercept": "False"
       }
     }
   },
   "Classification": {
     "ModelList": [
-      "MLPClassifierModel",
-      "PerceptionModel"
+      "PerceptionModel",
+      "MLPClassifierModel"
     ],
     "InitialParameters": {
       "PerceptionModel": {
         "n_iter": 3
       },
       "MLPClassifierModel": {
-        "solver": "lbfgs",
+        "solver": [
+          "lbfgs",
+          "sgd",
+          "adam"
+        ],
+        "solver_index": 0,
         "alpha": 0.00001,
         "hidden_layer_sizes": "(100,100,100,100)",
         "random_state": 1

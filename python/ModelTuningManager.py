@@ -4,7 +4,7 @@
 
 class ModelTuningManager():
 
-    history = {0: {}}
+    history = {}
     attempt = 0
     current_model_index = -1
     current_max_score = -1
@@ -13,11 +13,11 @@ class ModelTuningManager():
         return
 
     def add_history(self, model_index, parameters, score):
-        if self.history[model_index] == {}:
+        if self.history.__contains__(model_index):
+            self.attempt += 1
+        else:
             self.attempt = 0
             self.history[model_index] = {}
-        else:
-            self.attempt += 1
 
         self.history[model_index][self.attempt] = [parameters, score]
         self.current_model_index = model_index

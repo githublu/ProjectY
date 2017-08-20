@@ -42,7 +42,6 @@ testCounts = 0
 
 def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName):
     global actionOutcome, selectQuery, modelInput, dataTypeQuery, targetName
-    log_debug("function enter: EntryPoint")
     selectQuery = userSelectQuery
     dataTypeQuery = userdataTypeQuery
     targetName = userTargetName
@@ -65,7 +64,6 @@ def PrecondictionCheck():
 # Reading data from mysql and format into usable format
 def DataInjestion():
     global actionOutcome, totalDataset
-    log_debug("function enter: DataInjestion")
     totalDataset = GetTable(selectQuery)
     actionOutcome = "ProblemParsing"
     return
@@ -94,7 +92,6 @@ def ProblemParsing():
 # This will always give you a new model
 def ModelSelection():
     global actionOutcome, currentModel, currentModelParameter, currentModelIndex
-    log_debug("doing ModelSelection")
     currentModel = modelManager.next_model()
 
     # for the last model, go to prediction only
@@ -115,7 +112,6 @@ def ModelSelection():
 # Call model's function for specific preprocessing
 def DataPreprocessing():
     global actionOutcome, sourceDataset, targetSet, sourceTrainingSet, targetTrainingSet, sourceTestSet, targetTestSet
-    log_debug("doing preprocessing")
     for X, y in totalDataset:
         sourceDataset = currentModel.preprocessing(X)
         targetSet = currentModel.preprocessing(y)
@@ -131,7 +127,6 @@ def DataPreprocessing():
 def DataTuning():
     global actionOutcome, modelTuningManager, totalCounter
     totalCounter += 1
-    log_debug("doing DataTuning")
     if modelTuningManager.keep_tune():
         currentModel.tune()
         actionOutcome = "ModelTraining"
@@ -145,7 +140,6 @@ def DataTuning():
 def ModelTraining():
     global actionOutcome
 
-    log_debug("doing ModelTraining")
     currentModel.fit(sourceTrainingSet, targetTrainingSet)
     actionOutcome = "ModelTestingAndComparison"
     return
@@ -155,12 +149,10 @@ def ModelTraining():
 # Always go back to DataTuning state to determine next step if current model with current parameter is not good enough
 def ModelTestingAndComparison():
     global actionOutcome, currentBestScore, currentBestModel, score, testCounts
-    log_debug("doing ModelTestingAndComparison")
-
 
     if testCounts < 3:
         score += currentModel.score(sourceTestSet, targetTestSet)
-        log_debug("attempt %d score is %s" % (testCounts, score))
+        log_debug("attempt %d score is %s" % (testCounts, score/(testCounts+1)))
         testCounts += 1
         actionOutcome = "DataPreprocessing"
         return
@@ -186,7 +178,6 @@ def ModelTestingAndComparison():
 # Once the best model is found, make prediction and return
 def Prediction():
     global actionOutcome, prediction
-    log_debug("doing Prediction")
     if currentBestScore <= 0:
         actionOutcome = "NotAccurate"
     else:
@@ -216,8 +207,8 @@ FSMStableStates = FSMFailureStableState + FSMSuccessStableState
 
 # # main entry point
 ## example of using MLPClassifier
-EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", [5.9, 3, 5.1], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
-#EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", [5.9, 3, 5.1, 1.8], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
+#EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", [5.9, 3, 5.1], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
+EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", [5.9, 3, 5.1, 1.8], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
 #EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
            # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
            # "violent crime"
