@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -53,7 +54,7 @@ def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName):
 
 def PrecondictionCheck():
     global actionOutcome
-    if modelInput == [] or selectQuery == "":
+    if modelInput is None or selectQuery == "":
         actionOutcome = "FailedPreconditionCheck"
         return
 
@@ -73,7 +74,7 @@ def DataInjestion():
 # Regression or classification
 # Prediction or abnormality detection
 def ProblemParsing():
-    global actionOutcome, modelManager, typeOfProblem, modelTuningManager
+    global actionOutcome, modelManager, typeOfProblem, modelTuningManager, targetName
     typeOfProblem = GetProblemType(dataTypeQuery, targetName).type
     if typeOfProblem == "regression":
         modelManager = RegressionModelManager()
@@ -101,7 +102,7 @@ def ModelSelection():
         return
 
     currentModelIndex = modelManager.get_model_index()
-    log_info("current model index %s" % currentModelIndex)
+    log_debug("current model index %s" % currentModelIndex)
 
     # first time for this new model
     actionOutcome = "DataPreprocessing"
@@ -183,7 +184,7 @@ def Prediction():
     else:
         log_debug("best model is %s" % currentBestModel.get_model_name())
         prediction = currentBestModel.predict(modelInput)
-        log_debug(prediction)
+        log_info(prediction)
 
     return
 
@@ -206,9 +207,15 @@ FSMStableStates = FSMFailureStableState + FSMSuccessStableState
 
 
 # # main entry point
-## example of using MLPClassifier
-#EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", [5.9, 3, 5.1], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
-EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", [5.9, 3, 5.1, 1.8], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
+select_statement = sys.argv[1]
+prediect_input = sys.argv[2].split(',')
+schema_statement = sys.argv[3]
+target_name = sys.argv[4]
+
+EntryPoint(select_statement, prediect_input, schema_statement, target_name)
+
+#EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
+#EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", [5.9, 3, 5.1, 1.8], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
 #EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
            # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
            # "violent crime"

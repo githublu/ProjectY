@@ -1,5 +1,6 @@
 import pymysql
 import numpy as np
+import uuid
 
 hostname = 'localhost'
 username = 'root'
@@ -41,3 +42,12 @@ def GetTable(selectQuery) :
     tup += target,
     dataset.append(tup)
     return dataset
+
+def CreateOutput(predict, score):
+    id = "out" + str(uuid.uuid4()).replace('-', '0')
+    createOutTableIfNotExistsQuery = "CREATE TABLE IF NOT EXISTS predictions (id varchar(50), predict varchar(255), score double);"
+    ExecQuery(createOutTableIfNotExistsQuery)
+    insertIntoQuery = "INSERT INTO predictions VALUES ('" + id + "', '" + str(predict) + "', " + str(score) + ");"
+    ExecQuery(insertIntoQuery)
+    selectResutlQuery = "select * from predictions where id = '" + id + "';"
+    print(selectResutlQuery)

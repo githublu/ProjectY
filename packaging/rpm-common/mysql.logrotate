@@ -27,10 +27,10 @@
 #        compress
 #    postrotate
 #       # just if mysqld is really running
-#       if test -x /Users/Yanhan/mysql-bin/5.7/bin/mysqladmin && \
-#          /Users/Yanhan/mysql-bin/5.7/bin/mysqladmin ping &>/dev/null
+#       if test -x /Users/yilu/mysql-bin/5.7/bin/mysqladmin && \
+#          /Users/yilu/mysql-bin/5.7/bin/mysqladmin ping &>/dev/null
 #       then
-#          /Users/Yanhan/mysql-bin/5.7/bin/mysqladmin flush-logs
+#          /Users/yilu/mysql-bin/5.7/bin/mysqladmin flush-logs
 #       fi
 #    endscript
 #}
