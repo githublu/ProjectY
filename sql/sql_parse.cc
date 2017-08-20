@@ -1183,6 +1183,8 @@ void reset_statement_timer(THD *thd)
 
 using std::string;
 using std::vector;
+using std::endl;
+using std::cout;
 
 int findSplitor(std::string token, std::vector<string> splitors)
 {
@@ -1197,7 +1199,7 @@ int findSplitor(std::string token, std::vector<string> splitors)
     return -1;
 }
 
-void tokenize(const std::vector<std::vector<std::string>> & splitorVecs, std::vector<string> tokens, std::vector<int>& numbers, std::string& tableName,
+void tokenize(const std::vector<std::vector<std::string> > & splitorVecs, std::vector<string> tokens, std::vector<int>& numbers, std::string& tableName,
                 std::vector<string>& thingsToUseList, std::string& selectQuery, std::string& schemaQuery, std::vector<string>& thingsToPred)
 {
     std::string databasename = "'testdb1'";
@@ -1423,7 +1425,7 @@ char* createPythonProcess(char* query)
     std::vector<string> firstSplitorVec = {"predict"};
     std::vector<string> secondSplitorVec = {"from"};
     std::vector<string> thirdSplitorVec = {"using"};
-    std::vector<vector<string>> splitorVecs = {firstSplitorVec, secondSplitorVec, thirdSplitorVec};
+    std::vector<vector<string> > splitorVecs = {firstSplitorVec, secondSplitorVec, thirdSplitorVec};
     char * pch;
     pch = strtok (query," \t \n");
     while (pch != NULL)
