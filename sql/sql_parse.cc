@@ -1181,6 +1181,9 @@ void reset_statement_timer(THD *thd)
 
 #ifdef YY
 
+using std::string;
+using std::vector;
+
 int findSplitor(std::string token, std::vector<string> splitors)
 {
 
@@ -1194,7 +1197,7 @@ int findSplitor(std::string token, std::vector<string> splitors)
     return -1;
 }
 
-void tokenize(const std::vector<vector<string>> & splitorVecs, std::vector<string> tokens, std::vector<int>& numbers, std::string& tableName,
+void tokenize(const std::vector<std::vector<std::string>> & splitorVecs, std::vector<string> tokens, std::vector<int>& numbers, std::string& tableName,
                 std::vector<string>& thingsToUseList, std::string& selectQuery, std::string& schemaQuery, std::vector<string>& thingsToPred)
 {
     std::string databasename = "'testdb1'";
@@ -1210,8 +1213,8 @@ void tokenize(const std::vector<vector<string>> & splitorVecs, std::vector<strin
     //vector<string> thingsToPred;
     
     
-    std::map<string, int> tokenIndexMap;
-    std::set<string> thingsToUse;
+    std::map<std::string, int> tokenIndexMap;
+    std::set<std::string> thingsToUse;
     
     
     bool tokenEnd = false;
