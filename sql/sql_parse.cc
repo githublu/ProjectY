@@ -1208,8 +1208,8 @@ void tokenize(const std::vector<std::vector<std::string> > & splitorVecs, std::v
     // ' and TABLE_SCHEMA = 'testdb1'
     //
     
-    std::string SchemaQueryPart1 {"SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = '"};
-    std::string SchemaQueryPart2 {"' and TABLE_SCHEMA = "};
+    std::string SchemaQueryPart1 ("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = '");
+    std::string SchemaQueryPart2 ("' and TABLE_SCHEMA = ");
     
     int curSplitorIndex = 0;
     //vector<string> thingsToPred;
@@ -1422,9 +1422,12 @@ char* createPythonProcess(char* query)
     std::vector<string> tokens;
     
     std::vector<int> values;
-    std::vector<string> firstSplitorVec = {"predict"};
-    std::vector<string> secondSplitorVec = {"from"};
-    std::vector<string> thirdSplitorVec = {"using"};
+    std::vector<string> firstSplitorVec;
+    firstSplitorVec.push_back("predict");
+    std::vector<string> secondSplitorVec;
+    secondSplitorVec.push_back("from");
+    std::vector<string> thirdSplitorVec;
+    thirdSplitorVec.push_back("using");
     std::vector<vector<string> > splitorVecs = {firstSplitorVec, secondSplitorVec, thirdSplitorVec};
     char * pch;
     pch = strtok (query," \t \n");
