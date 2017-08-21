@@ -1468,7 +1468,9 @@ char* createPythonProcess(char* query)
     commandLine.append(predList[0]);
 
     const char *cstr = commandLine.c_str();
+
     char* exec = const_cast<char*>(cstr);
+    std::cout<<"DEBUG.     "<<exec<<endl;
 /*  int execLength = sizeof(program) + sizeof(scriptPath) + sizeof(query);
   char exec[execLength + 1];
   memcpy(exec, program, sizeof(program));
@@ -1477,7 +1479,7 @@ char* createPythonProcess(char* query)
 */
   FILE *fp;
   int status;
-  char *output = new char[51]; 
+  char *output = new char[92]; 
 
   fp = popen(exec, "r");
   if(fp == NULL)
@@ -1485,7 +1487,7 @@ char* createPythonProcess(char* query)
     sql_print_error("empty output stream");
   }
 
-  if (fgets(output, 51, fp) != NULL)
+  if (fgets(output, 92, fp) != NULL)
   {
     //sql_print_information("%s\n", output);
   }
@@ -1528,9 +1530,10 @@ void predictWritter(const COM_DATA *com_data, const char* filePath)
         str[new_length] = 0;
         sql_print_information("before creating python prcess");
         output = createPythonProcess(str);
+        std::cout<<"FINAL:   "<<output<<endl;
 
         com_data_alias->com_query.query = output;
-        com_data_alias->com_query.length = 50;
+        com_data_alias->com_query.length = 91;
         output = nullptr;
         
     }

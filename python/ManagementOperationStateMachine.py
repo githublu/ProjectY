@@ -184,7 +184,8 @@ def Prediction():
     else:
         log_debug("best model is %s" % currentBestModel.get_model_name())
         prediction = currentBestModel.predict(modelInput)
-        log_info(prediction)
+        log_debug(prediction)
+        CreateOutput(prediction, currentBestScore)
 
     return
 
@@ -227,7 +228,7 @@ while actionOutcome not in FSMStableStates:
 
 if actionOutcome in FSMSuccessStableState:
     FSMStates[actionOutcome]()
-    log_info("exit successfully")
+    log_debug("exit successfully")
     exit()
 else:
-    log_info("rollback at state %s" % actionOutcome)
+    log_debug("rollback at state %s" % actionOutcome)

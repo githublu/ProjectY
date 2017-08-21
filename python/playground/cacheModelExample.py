@@ -98,12 +98,16 @@ for X, y in dataset:
 feature2= [5.9, 3, 5.1, 1.8]
 
 
-print(currentModel.predict(feature2))
+#print(currentModel.predict(feature2))
 
 
 f = open("/Users/yilu/Projects/mysql-server/python/output.txt","w")
 
 modelDump = pickle.dumps(currentModel)
+
+
+#read from table and do prediction
+
 
 f.write("%s\r" % modelDump)
 
@@ -113,9 +117,12 @@ f = open("/Users/yilu/Projects/mysql-server/python/output.txt","r")
 modelDumpDes = f.read()
 f.close()
 
-model2 = pickle.loads(modelDumpDes)
-print("print deserilized model")
-print(model2.predict(feature2))
+
+
+
+# model2 = pickle.loads(modelDumpDes)
+# print("print deserilized model")
+# print(model2.predict(feature2))
 
 # dropIfExistQuery = "DROP TABLE IF EXISTS " + tableName + ";"
 # ExecQuery(dbConnection, dropIfExistQuery)

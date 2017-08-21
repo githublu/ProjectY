@@ -44,10 +44,22 @@ def GetTable(selectQuery) :
     return dataset
 
 def CreateOutput(predict, score):
+    conn = pymysql.connect(host=hostname, user=username, passwd=password, db=database)
+
     id = "out" + str(uuid.uuid4()).replace('-', '0')
-    createOutTableIfNotExistsQuery = "CREATE TABLE IF NOT EXISTS predictions (id varchar(50), predict varchar(255), score double);"
-    ExecQuery(createOutTableIfNotExistsQuery)
+    createOutTableIfNotExistsQuery = "CREATE TABLE IF NOT EXISTS predictions (id varchar(255), predict varchar(255), score double);"
+    CommitQuery(createOutTableIfNotExistsQuery, conn)
+
     insertIntoQuery = "INSERT INTO predictions VALUES ('" + id + "', '" + str(predict) + "', " + str(score) + ");"
-    ExecQuery(insertIntoQuery)
-    selectResutlQuery = "select * from predictions where id = '" + id + "';"
+    CommitQuery(insertIntoQuery, conn)
+
+    selectResutlQuery = "select predict, score from predictions where id = '" + id + "'"
+
+    conn.close()
+
     print(selectResutlQuery)
+
+def CommitQuery(query, conn):
+    cur = conn.cursor()
+    cur.execute(query)
+    conn.commit()
