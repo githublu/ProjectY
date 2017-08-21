@@ -1199,7 +1199,7 @@ int findSplitor(std::string token, std::vector<string> splitors)
     return -1;
 }
 
-void tokenize(const std::vector<std::vector<std::string> > & splitorVecs, std::vector<string> tokens, std::vector<int>& numbers, std::string& tableName,
+void tokenize(const std::vector<std::vector<std::string> > & splitorVecs, std::vector<string> tokens, std::vector<string>& numbers, std::string& tableName,
                 std::vector<string>& thingsToUseList, std::string& selectQuery, std::string& schemaQuery, std::vector<string>& thingsToPred)
 {
     std::string databasename = "'testdb1'";
@@ -1355,8 +1355,7 @@ void tokenize(const std::vector<std::vector<std::string> > & splitorVecs, std::v
                 else if(tokens[i][lastCharOfCurToken] == ','){
                     num = tokens[i].substr(0, lastCharOfCurToken);
                 }
-                int val = atoi(num.c_str());
-                numbers.push_back(val);
+                numbers.push_back(num);
                 //cout<<"token[i] "<<tokens[i]<<" lastCharOfCurToken: "<< lastCharOfCurToken <<" num: "<< num<< " c_str: "<< num.c_str()<<" val: "<<val <<endl;
             }
         }
@@ -1415,14 +1414,14 @@ char* createPythonProcess(char* query)
   sql_print_information("Enter createPythonProcess");
 
     char program[] = "python ";
-    char scriptPath[] = "/Users/yilu/Projects/mysql-server/python/ManagementOperationStateMachine.py.py ";
+    char scriptPath[] = "/Users/yilu/Projects/mysql-server/python/ManagementOperationStateMachine.py ";
     
     std::string commandLine;
     
     std::vector<string> tokens;
     
     std::vector<int> values;
-    
+
     std::vector<string> firstSplitorVec;
     firstSplitorVec.push_back("predict");
     std::vector<string> secondSplitorVec;
@@ -1430,7 +1429,7 @@ char* createPythonProcess(char* query)
     std::vector<string> thirdSplitorVec;
     thirdSplitorVec.push_back("using");
 
-    std::vector<vector<string>> splitorVecs;
+    std::vector<vector<string> > splitorVecs;
     splitorVecs.push_back(firstSplitorVec);
     splitorVecs.push_back(secondSplitorVec);
     splitorVecs.push_back(thirdSplitorVec);
@@ -1445,7 +1444,7 @@ char* createPythonProcess(char* query)
         pch = strtok (NULL, " \t \n");
     }
     
-    std::vector<int> numbers;
+    std::vector<string> numbers;
     std::string tableName;
     std::vector<string> usedList;
     std::vector<string> predList;
@@ -1457,7 +1456,7 @@ char* createPythonProcess(char* query)
     commandLine.append(program).append(scriptPath).append("\"").append(selectQuery).append("\" ");
     for(int i = 0; i < numbers.size(); ++i)
     {
-        commandLine.append(std::to_string(numbers[i]));
+        commandLine.append(numbers[i]);
         if(i != numbers.size() - 1)
         {
             commandLine.append(",");
