@@ -1422,13 +1422,19 @@ char* createPythonProcess(char* query)
     std::vector<string> tokens;
     
     std::vector<int> values;
+    
     std::vector<string> firstSplitorVec;
     firstSplitorVec.push_back("predict");
     std::vector<string> secondSplitorVec;
     secondSplitorVec.push_back("from");
     std::vector<string> thirdSplitorVec;
     thirdSplitorVec.push_back("using");
-    std::vector<vector<string> > splitorVecs = {firstSplitorVec, secondSplitorVec, thirdSplitorVec};
+
+    std::vector<vector<string>> splitorVecs;
+    splitorVecs.push_back(firstSplitorVec);
+    splitorVecs.push_back(secondSplitorVec);
+    splitorVecs.push_back(thirdSplitorVec);
+
     char * pch;
     pch = strtok (query," \t \n");
     while (pch != NULL)
