@@ -3,6 +3,7 @@ from CommonHelper.QueryExec import *
 allTypes = {
     "classification": "classification",
     "regression": "regression",
+    "clustering": "clustering",
     "invalid": "invalid"
 }
 
@@ -15,10 +16,13 @@ class ProblemType:
 # return the type of problem
 # assumes everything columns are in order
 # the last one is target, the rest are features
-def GetProblemType(dateTypeQuery, targetName):
+def GetProblemType(dateTypeQuery, targetName, type):
     dataTypeTable = ExecQuery(dateTypeQuery)
     dataTypes = {}
     targetType = ""
+    if type == "similar":
+        return ProblemType("clustering")
+
     for row in dataTypeTable:
         dataTypes[row[0]] = row[1]
         if row[0] == targetName:

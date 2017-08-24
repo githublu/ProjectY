@@ -1,19 +1,12 @@
 import sys
-import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import classification_report,confusion_matrix
-import pymysql
-import pickle as pickle
-from sklearn.preprocessing import PolynomialFeatures
 from CommonHelper.QueryExec import *
 from Models.RegressionModelManager import *
 from Models.ClassificationModelManager import *
+from Models.ClusteringModelManager import *
 from Logger.logger import *
 from ProblemParser import *
 from ModelTuningManager import *
-from sklearn import svm
 
 actionOutcome = ""
 errorState = 0
@@ -40,9 +33,11 @@ typeOfProblem = ""
 score = 0
 totalCounter = 0
 testCounts = 0
+problemType = None
 
-def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName):
-    global actionOutcome, selectQuery, modelInput, dataTypeQuery, targetName
+def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName, type="predict"):
+    global actionOutcome, selectQuery, modelInput, dataTypeQuery, targetName, problemType
+    problemType = type
     selectQuery = userSelectQuery
     dataTypeQuery = userdataTypeQuery
     targetName = userTargetName
@@ -75,11 +70,13 @@ def DataInjestion():
 # Prediction or abnormality detection
 def ProblemParsing():
     global actionOutcome, modelManager, typeOfProblem, modelTuningManager, targetName
-    typeOfProblem = GetProblemType(dataTypeQuery, targetName).type
+    typeOfProblem = GetProblemType(dataTypeQuery, targetName, problemType).type
     if typeOfProblem == "regression":
         modelManager = RegressionModelManager()
     elif typeOfProblem == "classification":
         modelManager = ClassificationModelManager()
+    elif typeOfProblem == "clustering":
+        modelManager = ClusteringModelManager()
     else:
         actionOutcome = "InvalidProblemType"
         return
@@ -105,7 +102,12 @@ def ModelSelection():
     log_debug("current model index %s" % currentModelIndex)
 
     # first time for this new model
-    actionOutcome = "DataPreprocessing"
+    if typeOfProblem == "clustering":
+        #go to new state
+        actionOutcome = "ModelTestingAndComparison"
+    else:
+        actionOutcome = "DataPreprocessing"
+
     return
 
 # Only preprocess the data once for each new model
