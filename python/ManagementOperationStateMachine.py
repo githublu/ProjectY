@@ -46,7 +46,13 @@ def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName):
     selectQuery = userSelectQuery
     dataTypeQuery = userdataTypeQuery
     targetName = userTargetName
-    modelInput = np.array(userInput).reshape(1,-1)
+    tmpInput = np.array(userInput).reshape(1,-1)[0]
+    for v in tmpInput:
+        try:
+            tmp = float(v)
+            modelInput.append(tmp)
+        except ValueError:
+            modelInput.append(y)
 
     actionOutcome = "PrecondictionCheck"
     return
@@ -216,7 +222,7 @@ target_name = sys.argv[4]
 EntryPoint(select_statement, prediect_input, schema_statement, target_name)
 
 #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
-#EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", [5.9, 3, 5.1, 1.8], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
+#EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
 #EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
            # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
            # "violent crime"

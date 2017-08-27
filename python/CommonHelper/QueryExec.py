@@ -50,7 +50,7 @@ def CreateOutput(predict, score):
     createOutTableIfNotExistsQuery = "CREATE TABLE IF NOT EXISTS predictions (id varchar(255), predict varchar(255), score double);"
     CommitQuery(createOutTableIfNotExistsQuery, conn)
 
-    insertIntoQuery = "INSERT INTO predictions VALUES ('" + id + "', '" + str(predict) + "', " + str(score) + ");"
+    insertIntoQuery = "INSERT INTO predictions VALUES ('" + id + "', '" + str(predict[0]) + "', " + str(score) + ");"
     CommitQuery(insertIntoQuery, conn)
 
     selectResutlQuery = "select predict, score from predictions where id = '" + id + "'"
