@@ -47,7 +47,7 @@ def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName, ty
             tmp = float(v)
             modelInput.append(tmp)
         except ValueError:
-            modelInput.append(y)
+            modelInput.append(v)
 
     actionOutcome = "PrecondictionCheck"
     return
@@ -59,17 +59,8 @@ def PrecondictionCheck():
         actionOutcome = "FailedPreconditionCheck"
         return
 
-    actionOutcome = "DataInjestion"
-    return
-
-
-# Reading data from mysql and format into usable format
-def DataInjestion():
-    global actionOutcome, totalDataset
-    totalDataset = GetTable(selectQuery)
     actionOutcome = "ProblemParsing"
     return
-
 
 # ProblemParsing determines what type of the question it is. Translate the query into steps
 # Regression or classification
@@ -88,6 +79,14 @@ def ProblemParsing():
         return
 
     modelTuningManager = ModelTuningManager()
+    actionOutcome = "DataIngestion"
+    return
+
+
+# Reading data from mysql and format into usable format
+def DataIngestion():
+    global actionOutcome, totalDataset
+    totalDataset = GetTable(selectQuery)
     actionOutcome = "ModelSelection"
     return
 
@@ -193,50 +192,46 @@ def Prediction():
         log_debug("best model is %s" % currentBestModel.get_model_name())
         prediction = currentBestModel.predict(modelInput)
         log_debug(prediction)
-        CreateOutput(prediction, currentBestScore)
+        if is_debug() == False:
+            CreateOutput(prediction, currentBestScore)
 
     return
 
+def Start(select_statement, predict_input, schema_statement, target_name):
 
-FSMStates = {
-    "PrecondictionCheck": PrecondictionCheck,
-    "ProblemParsing": ProblemParsing,
-    "DataInjestion": DataInjestion,
-    "ModelSelection": ModelSelection,
-    "DataPreprocessing": DataPreprocessing,
-    "DataTuning": DataTuning,
-    "ModelTraining": ModelTraining,
-    "ModelTestingAndComparison": ModelTestingAndComparison,
-    "Prediction": Prediction
-}
+    FSMStates = {
+        "PrecondictionCheck": PrecondictionCheck,
+        "ProblemParsing": ProblemParsing,
+        "DataInjestion": DataIngestion,
+        "ModelSelection": ModelSelection,
+        "DataPreprocessing": DataPreprocessing,
+        "DataTuning": DataTuning,
+        "ModelTraining": ModelTraining,
+        "ModelTestingAndComparison": ModelTestingAndComparison,
+        "Prediction": Prediction
+    }
 
-FSMSuccessStableState = ["Prediction"]
-FSMFailureStableState = ["NotAccurate", "FailedPreconditionCheck", "InvalidProblemType"]
-FSMStableStates = FSMFailureStableState + FSMSuccessStableState
+    FSMSuccessStableState = ["Prediction"]
+    FSMFailureStableState = ["NotAccurate", "FailedPreconditionCheck", "InvalidProblemType"]
+    FSMStableStates = FSMFailureStableState + FSMSuccessStableState
 
+    # Main entry point
+    # EntryPoint(select_statement,predict_input, schema_statement, target_name)
 
-# # main entry point
-select_statement = sys.argv[1]
-prediect_input = sys.argv[2].split(',')
-schema_statement = sys.argv[3]
-target_name = sys.argv[4]
-
-EntryPoint(select_statement, prediect_input, schema_statement, target_name)
-
-#EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
-#EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
-#EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
-           # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
-           # "violent crime"
-           # )
-while actionOutcome not in FSMStableStates:
-    log_debug(actionOutcome)
-    FSMStates[actionOutcome]()
+    EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
+    #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
+    #EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
+               # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
+               # "violent crime"
+               # )
+    while actionOutcome not in FSMStableStates:
+        log_debug(actionOutcome)
+        FSMStates[actionOutcome]()
 
 
-if actionOutcome in FSMSuccessStableState:
-    FSMStates[actionOutcome]()
-    log_debug("exit successfully")
-    exit()
-else:
-    log_debug("rollback at state %s" % actionOutcome)
+    if actionOutcome in FSMSuccessStableState:
+        FSMStates[actionOutcome]()
+        log_debug("exit successfully")
+        exit()
+    else:
+        log_debug("rollback at state %s" % actionOutcome)

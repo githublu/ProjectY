@@ -26,16 +26,15 @@ class NearestNeighborsModel:
         except IndexError:
             log_error("parameter degree does not exit")
 
-    def fit_all(self, training_set):
+    def fit(self, training_set):
         distance, indices = self.model.kneighbors(input)
         self.kneighbors = indices
         return self.model.fit(training_set)
 
-    def predict_count(self, input, count):
-        predicted_indices = self.model.kneighbors(input)
+    def predict_count(self, reference, count):
         # from the kneighbors, find all the similar rows in the table up to counts
-
-        return self.model.kneighbors(input)
+        # return indices of similar entries
+        return self.model.kneighbors(reference, count)[1][0]
 
     def get_if_continue(self):
         return self.if_continue

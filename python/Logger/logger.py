@@ -1,6 +1,6 @@
 import sys
 
-debug = 0
+debug = True
 
 
 def log_info(message):
@@ -14,5 +14,8 @@ def log_warning(warning):
     print("WARNING: %s" % warning)
 
 def log_debug(message):
-    if debug == 1:
+    if debug:
         print(message)
+
+def is_debug():
+    return debug

@@ -1,5 +1,6 @@
 import json
 from Models.ModelManager import ModelManager
+from Models.NearestNeighbors import *
 from Logger.logger import *
 
 class ClusteringModelManager(ModelManager):
@@ -7,25 +8,20 @@ class ClusteringModelManager(ModelManager):
         ModelManager.__init__(self)
         # D:\Projects\ProjectY\python\ModelConfig\model.json
         # /Users/yilu/Projects/mysql-server/python/ModelConfig/model.json
-        with open('/Users/yilu/Projects/mysql-server/python/ModelConfig/model.json') as model_config_file:
+        with open('D:\Projects\ProjectY\python\ModelConfig\model.json') as model_config_file:
             model_config_all = json.load(model_config_file)
 
-        self.model_config = model_config_all["Regression"]
+        self.model_config = model_config_all["Clustering"]
         self.modelList = self.model_config["ModelList"]
 
-    def net_model(self):
-        self.set_model_index(self.modelIndex + 1)
-        return self.get_model(self.modelIndex, None)
+# no-ops
+    def next_model(self):
+        return
 
-    def get_model(self, model_index, parameters):
-        try:
-            model = self.modelList[model_index]
-            if parameters is None:
-                parameters = self.model_config["InitialParameters"][model]
+    def get_model(self, model_name, parameters):
+        for model in self.modelList:
+            if model == model_name:
+                self.modelParameter = self.model_config["InitialParameters"][model]
+                return NearestNeighbors(self.modelParameter)
 
-            if model == "NearestNeighbors":
-                return
-        except IndexError:
-            return None
-        except ValueError as error:
-            log_warning(repr(error))
+

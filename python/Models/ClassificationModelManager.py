@@ -12,7 +12,7 @@ class ClassificationModelManager(ModelManager):
         ModelManager.__init__(self)
         # D:\Projects\ProjectY\python\ModelConfig\model.json
         # /Users/yilu/Projects/mysql-server/python/ModelConfig/model.json
-        with open('/Users/yilu/Projects/mysql-server/python/ModelConfig/model.json') as model_config_file:
+        with open('D:\Projects\ProjectY\python\ModelConfig\model.json') as model_config_file:
             model_config_all = json.load(model_config_file)
 
         self.model_config = model_config_all["Classification"]
