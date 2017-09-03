@@ -27,8 +27,8 @@ class NearestNeighborsModel:
             log_error("parameter degree does not exit")
 
     def fit(self, training_set):
-        distance, indices = self.model.kneighbors(input)
-        self.kneighbors = indices
+        # distance, indices = self.model.kneighbors(input)
+        # self.kneighbors = indices
         return self.model.fit(training_set)
 
     def predict_count(self, reference, count):

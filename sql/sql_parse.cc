@@ -1414,7 +1414,7 @@ char* createPythonProcess(char* query)
   sql_print_information("Enter createPythonProcess");
 
     char program[] = "python ";
-    char scriptPath[] = "/Users/yilu/Projects/mysql-server/python/ManagementOperationStateMachine.py ";
+    char scriptPath[] = "/Users/yilu/Projects/mysql-server/python/EntryPoint.py ";
     
     std::string commandLine;
     

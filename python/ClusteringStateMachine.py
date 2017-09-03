@@ -27,17 +27,17 @@ def PrecondictionCheck(userSelectQuery, userReference, userFindCount):
 
 def DataIngestion():
     global actionOutcome, sampleDataset
-    sampleDataset = GetTable(selectQuery)
+    sampleDataset = GetClusteringTable(selectQuery)
     actionOutcome = "ModelSelection"
     return
 
 # needs to determine which model to use
 def ModelSelection():
-    global actionOutcome
+    global actionOutcome, currentModel
     # TODO: determine which model need to be used
 
     # currently only Nearest Neighbors is supported
-    currentModel = ClusteringModelManager().get_model(NearestNeighborsModel, None)
+    currentModel = ClusteringModelManager().get_model("NearestNeighborsModel", None)
     currentModel.fit(sampleDataset)
 
     actionOutcome = "FindSimilar"
@@ -45,7 +45,7 @@ def ModelSelection():
 
 # return final prediction result
 def FindSimilar():
-    global findCount
+    global findCount, currentModel
     output = []
     similar_indices = currentModel.predict_count(reference, findCount)
 
@@ -56,10 +56,10 @@ def FindSimilar():
 
 
 # entry point
-def Start(userSelectQuery, userTargetName, userModelInput):
+def Start(userSelectQuery, userModelInput, count):
     # define all the states
     FSMStates = {
-        "DataInjestion": DataIngestion,
+        "DataIngestion": DataIngestion,
         "ModelSelection": ModelSelection,
         "FindSimilar": FindSimilar
     }
@@ -70,7 +70,7 @@ def Start(userSelectQuery, userTargetName, userModelInput):
     FSMStableStates = FSMFailureStableState + FSMSuccessStableState
 
     # entering the first state
-    PrecondictionCheck(userSelectQuery, userTargetName, userModelInput)
+    PrecondictionCheck(userSelectQuery, userModelInput, count)
 
     while actionOutcome not in FSMStableStates:
         log_debug(actionOutcome)
@@ -83,3 +83,4 @@ def Start(userSelectQuery, userTargetName, userModelInput):
         log_debug("rollback at state %s" % actionOutcome)
 
     return
+

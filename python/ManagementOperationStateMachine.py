@@ -73,7 +73,7 @@ def ProblemParsing():
     elif typeOfProblem == "classification":
         modelManager = ClassificationModelManager()
     elif typeOfProblem == "clustering":
-        modelManager = ClusteringModelManager()
+        return
     else:
         actionOutcome = "InvalidProblemType"
         return
@@ -202,7 +202,7 @@ def Start(select_statement, predict_input, schema_statement, target_name):
     FSMStates = {
         "PrecondictionCheck": PrecondictionCheck,
         "ProblemParsing": ProblemParsing,
-        "DataInjestion": DataIngestion,
+        "DataIngestion": DataIngestion,
         "ModelSelection": ModelSelection,
         "DataPreprocessing": DataPreprocessing,
         "DataTuning": DataTuning,
@@ -216,14 +216,15 @@ def Start(select_statement, predict_input, schema_statement, target_name):
     FSMStableStates = FSMFailureStableState + FSMSuccessStableState
 
     # Main entry point
-    # EntryPoint(select_statement,predict_input, schema_statement, target_name)
+    EntryPoint(select_statement,predict_input, schema_statement, target_name)
 
-    EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
+    #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
     #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
     #EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
                # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
                # "violent crime"
                # )
+    #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", 2, "similar")
     while actionOutcome not in FSMStableStates:
         log_debug(actionOutcome)
         FSMStates[actionOutcome]()
