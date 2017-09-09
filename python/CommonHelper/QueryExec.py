@@ -48,8 +48,6 @@ def GetClusteringTable(selectQuery) :
     cur = conn.cursor()
     cur.execute(selectQuery)
     data = []
-    dataset = []
-    tup = ()
     for row in cur:
         dataR = []
         for r in row:
@@ -75,21 +73,24 @@ def CreateOutput(predict, score):
 
     print(selectResutlQuery)
 
-def CreateClusterOutput(predict):
+def CreateClusterOutput(select_queries, max_number):
     conn = pymysql.connect(host=hostname, user=username, passwd=password, db=database)
 
     id = "cls" + str(uuid.uuid4()).replace('-', '0')
 
     # Drop the cluster table if exists (avoid creating many temp table for clustering)
-    dropTableIfExistsQuery = "DROP TABLE IF EXISTS clustering_result;"
+    dropTableIfExistsQuery = "DROP TABLE IF EXISTS " + str(id) + ";"
     CommitQuery(dropTableIfExistsQuery, conn)
 
-    # select into clustering_resutl table
-    selectSimilarIntoTableQuery = "CREATE TABLE clustering_result (SELECT * from user_table where ...);"
+    # select into clustering_result table
+    selectSimilarIntoTableQuery = "CREATE TABLE " + str(id) + " (" + select_queries[0] + ");"
     CommitQuery(selectSimilarIntoTableQuery, conn)
 
+    # if there is more than just one query, insert into table with select limit to max number
+
+
     # select the result back
-    selectResutlQuery = "select * from clustering_result;"
+    selectResutlQuery = "select * from " + str(id) + ";"
 
     conn.close()
 

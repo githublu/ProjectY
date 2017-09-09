@@ -22,6 +22,12 @@ def PrecondictionCheck(userSelectQuery, userReference, userFindCount):
     findCount = userFindCount
     reference = userReference
 
+    if findCount <= 0:
+        actionOutcome = "NegativeOrZeroRow"
+        return
+    if reference is None or reference == "":
+        actionOutcome = "NoReference"
+
     actionOutcome = "DataIngestion"
     return
 
@@ -46,17 +52,42 @@ def ModelSelection():
 # return final prediction result
 def FindSimilar():
     global findCount, currentModel
-    output = []
+    outputs = []
     similar_indices = currentModel.predict_count(reference, findCount)
 
     for i in similar_indices:
-        output.append(sampleDataset[i])
+        outputs.append(sampleDataset[i])
 
-    return output
+    query = "SELECT * FROM "
+
+    # get a list of parameters
+    index_of_from = selectQuery.find("from")
+    all_params = selectQuery[6: index_of_from].split(",")
+    table_name = selectQuery[index_of_from + 5:selectQuery.find(" ", index_of_from + 5)]
+    is_first = True
+    query += table_name + " WHERE "
+    tmp_query = query
+    queries = []
+    for output in outputs:
+        for i in range(0, len(all_params)):
+            if is_first:
+                tmp_query += str(all_params[i]) + " = " + str(output[i])
+                is_first = False
+            else:
+                tmp_query += " AND " + str(all_params[i]) + " = " + str(output[i])
+
+        queries.append(tmp_query)
+        tmp_query = query
+        is_first = True
+
+    if is_debug():
+        return queries
+    else:
+        CreateClusterOutput(queries, findCount)
 
 
 # entry point
-def Start(userSelectQuery, userModelInput, count):
+def ClusteringStateMachineStart(userSelectQuery, userModelInput, count):
     # define all the states
     FSMStates = {
         "DataIngestion": DataIngestion,
@@ -66,7 +97,7 @@ def Start(userSelectQuery, userModelInput, count):
 
     # define stable states
     FSMSuccessStableState = ["FindSimilar"]
-    FSMFailureStableState = ["NotAccurate", "FailedPreconditionCheck", "InvalidProblemType"]
+    FSMFailureStableState = ["NegativeOrZeroRow", "NoReference"]
     FSMStableStates = FSMFailureStableState + FSMSuccessStableState
 
     # entering the first state
@@ -83,4 +114,3 @@ def Start(userSelectQuery, userModelInput, count):
         log_debug("rollback at state %s" % actionOutcome)
 
     return
-

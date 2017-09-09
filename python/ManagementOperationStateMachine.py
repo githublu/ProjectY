@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from CommonHelper.QueryExec import *
 from Models.RegressionModelManager import *
 from Models.ClassificationModelManager import *
-from Models.ClusteringModelManager import *
+from ClusteringStateMachine import *
 from Logger.logger import *
 from ProblemParser import *
 from ModelTuningManager import *
@@ -73,6 +73,7 @@ def ProblemParsing():
     elif typeOfProblem == "classification":
         modelManager = ClassificationModelManager()
     elif typeOfProblem == "clustering":
+        actionOutcome = "Prediction"
         return
     else:
         actionOutcome = "InvalidProblemType"
@@ -186,6 +187,13 @@ def ModelTestingAndComparison():
 # Once the best model is found, make prediction and return
 def Prediction():
     global actionOutcome, prediction
+
+    if typeOfProblem == "clustering":
+        # overloading targetName with findCount
+        select_queries = ClusteringStateMachineStart(selectQuery, modelInput, targetName)
+        CreateClusterOutput(select_queries, targetName)
+        return
+
     if currentBestScore <= 0:
         actionOutcome = "NotAccurate"
     else:
@@ -216,15 +224,17 @@ def Start(select_statement, predict_input, schema_statement, target_name):
     FSMStableStates = FSMFailureStableState + FSMSuccessStableState
 
     # Main entry point
-    EntryPoint(select_statement,predict_input, schema_statement, target_name)
+    if is_debug() == False:
+        EntryPoint(select_statement,predict_input, schema_statement, target_name)
+    else:
+        #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
+        EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
+        #EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
+                   # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
+                   # "violent crime"
+                   # )
+        #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", 2, "similar")
 
-    #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
-    #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
-    #EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
-               # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
-               # "violent crime"
-               # )
-    #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", 2, "similar")
     while actionOutcome not in FSMStableStates:
         log_debug(actionOutcome)
         FSMStates[actionOutcome]()

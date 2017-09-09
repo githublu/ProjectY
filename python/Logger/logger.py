@@ -1,6 +1,6 @@
 import sys
 
-debug = True
+debug = False
 
 
 def log_info(message):
