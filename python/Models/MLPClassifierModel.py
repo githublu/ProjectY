@@ -7,7 +7,6 @@ class MLPClassifierModel(Model):
     def __init__(self, parameter):
         Model.__init__(self, "MLPClassifierModel")
         self.parameter = parameter
-        self.if_continue = True
         self.solver_index = self.parameter["solver_index"]
         self.model = MLPClassifier(solver=self.parameter["solver"][self.solver_index], alpha=self.parameter["alpha"],
                                    hidden_layer_sizes=literal_eval(self.parameter["hidden_layer_sizes"]), random_state=self.parameter["random_state"])
@@ -23,8 +22,8 @@ class MLPClassifierModel(Model):
     def fit(self, training_set, testing_set):
         return self.model.fit(training_set, testing_set)
 
-    def predict(self, input):
-        return self.model.predict(input)
+    def predict(self, user_input):
+        return self.model.predict(user_input)
 
     def score(self, source_test_set, target_test_set):
         return self.model.score(source_test_set, target_test_set)
@@ -39,5 +38,6 @@ class MLPClassifierModel(Model):
                                        hidden_layer_sizes=literal_eval(self.parameter["hidden_layer_sizes"]),
                                        random_state=self.parameter["random_state"])
         except IndexError:
-            self.if_continue = False
+            log_debug("end of solver")
+
         return

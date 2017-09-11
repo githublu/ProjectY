@@ -43,7 +43,14 @@ def ModelSelection():
     # TODO: determine which model need to be used
 
     # currently only Nearest Neighbors is supported
+    # if all fields are numerical
+    # or if fields are categorical, then convert them into 0,1 columns
     currentModel = ClusteringModelManager().get_model("NearestNeighborsModel", None)
+
+    # if the text field is not categorical and find similar text document
+    # use TFIDF to lable them and select similar ones
+
+    # fit model
     currentModel.fit(sampleDataset)
 
     actionOutcome = "FindSimilar"

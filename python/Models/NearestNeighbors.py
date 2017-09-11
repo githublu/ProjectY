@@ -8,7 +8,6 @@ class NearestNeighborsModel:
     model = None
     parameter = []
     model_name = ""
-    if_continue = True
     kneighbors = None
 
     def __init__(self, parameters):
@@ -35,9 +34,6 @@ class NearestNeighborsModel:
         # from the kneighbors, find all the similar rows in the table up to counts
         # return indices of similar entries
         return self.model.kneighbors(reference, count)[1][0]
-
-    def get_if_continue(self):
-        return self.if_continue
 
     def get_model_name(self):
         return self.model_name

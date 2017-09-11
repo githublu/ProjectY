@@ -7,6 +7,7 @@ from ClusteringStateMachine import *
 from Logger.logger import *
 from ProblemParser import *
 from ModelTuningManager import *
+from CommonHelper.ModelCache import *
 
 actionOutcome = ""
 errorState = 0
@@ -33,7 +34,7 @@ typeOfProblem = ""
 score = 0
 totalCounter = 0
 testCounts = 0
-problemType = None
+problemType = ""
 
 def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName, type="predict"):
     global actionOutcome, selectQuery, modelInput, dataTypeQuery, targetName, problemType
@@ -49,11 +50,11 @@ def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName, ty
         except ValueError:
             modelInput.append(v)
 
-    actionOutcome = "PrecondictionCheck"
+    actionOutcome = "PreconditionCheck"
     return
 
 
-def PrecondictionCheck():
+def PreconditionCheck():
     global actionOutcome
     if modelInput is None or selectQuery == "":
         actionOutcome = "FailedPreconditionCheck"
@@ -63,15 +64,29 @@ def PrecondictionCheck():
     return
 
 # ProblemParsing determines what type of the question it is. Translate the query into steps
-# Regression or classification
-# Prediction or abnormality detection
+# Regression or classification or Clustering or Abnormality detection
+# Apply model cache
 def ProblemParsing():
-    global actionOutcome, modelManager, typeOfProblem, modelTuningManager, targetName
+    global actionOutcome, modelManager, typeOfProblem, modelTuningManager, targetName, currentBestModel
+
+    # if there is existing model for this problem
+    cached_model = GetCachedModel(selectQuery+problemType)
+    if cached_model != False:
+        currentBestModel = cached_model
+        actionOutcome = "Prediction"
+        return
+
     typeOfProblem = GetProblemType(dataTypeQuery, targetName, problemType).type
     if typeOfProblem == "regression":
         modelManager = RegressionModelManager()
     elif typeOfProblem == "classification":
         modelManager = ClassificationModelManager()
+
+        # TODO: or it is text document classification, current only numeric classification is supported
+        # set retry to just one
+
+    # if there is no cached model and it is clustering problem
+    # that use ClusteringStateMachine instead of current statemachine
     elif typeOfProblem == "clustering":
         actionOutcome = "Prediction"
         return
@@ -108,11 +123,7 @@ def ModelSelection():
     log_debug("current model index %s" % currentModelIndex)
 
     # first time for this new model
-    if typeOfProblem == "clustering":
-        #go to new state
-        actionOutcome = "ModelTestingAndComparison"
-    else:
-        actionOutcome = "DataPreprocessing"
+    actionOutcome = "DataPreprocessing"
 
     return
 
@@ -185,20 +196,29 @@ def ModelTestingAndComparison():
     return
 
 # Once the best model is found, make prediction and return
+# or apply cached model
 def Prediction():
     global actionOutcome, prediction
 
+    # determine if it should be prediction of this statemachine or other statemachine
     if typeOfProblem == "clustering":
         # overloading targetName with findCount
         select_queries = ClusteringStateMachineStart(selectQuery, modelInput, targetName)
-        CreateClusterOutput(select_queries, targetName)
+        if is_debug() == False:
+            CreateClusterOutput(select_queries, targetName)
+        else:
+            log_debug(select_queries)
+
         return
 
+    # if the type fo the problem is not clustering, then it must use the regular statemachine
+    # classification or regression problem
     if currentBestScore <= 0:
         actionOutcome = "NotAccurate"
     else:
         log_debug("best model is %s" % currentBestModel.get_model_name())
         prediction = currentBestModel.predict(modelInput)
+        CacheModel(selectQuery + problemType, currentBestModel)
         log_debug(prediction)
         if is_debug() == False:
             CreateOutput(prediction, currentBestScore)
@@ -208,7 +228,7 @@ def Prediction():
 def Start(select_statement, predict_input, schema_statement, target_name):
 
     FSMStates = {
-        "PrecondictionCheck": PrecondictionCheck,
+        "PreconditionCheck": PreconditionCheck,
         "ProblemParsing": ProblemParsing,
         "DataIngestion": DataIngestion,
         "ModelSelection": ModelSelection,
@@ -227,8 +247,8 @@ def Start(select_statement, predict_input, schema_statement, target_name):
     if is_debug() == False:
         EntryPoint(select_statement,predict_input, schema_statement, target_name)
     else:
-        #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
-        EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
+        EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
+        #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
         #EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
                    # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
                    # "violent crime"

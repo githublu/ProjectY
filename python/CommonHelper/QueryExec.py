@@ -82,6 +82,8 @@ def CreateClusterOutput(select_queries, max_number):
     dropTableIfExistsQuery = "DROP TABLE IF EXISTS " + str(id) + ";"
     CommitQuery(dropTableIfExistsQuery, conn)
 
+    # make the query union together and limit max_number
+
     # select into clustering_result table
     selectSimilarIntoTableQuery = "CREATE TABLE " + str(id) + " (" + select_queries[0] + ");"
     CommitQuery(selectSimilarIntoTableQuery, conn)

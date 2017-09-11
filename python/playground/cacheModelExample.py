@@ -1,6 +1,3 @@
-# Author: Issam H. Laradji
-# License: BSD 3 clause
-
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap

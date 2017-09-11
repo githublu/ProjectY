@@ -6,7 +6,6 @@ class Model(object):
     model = None
     parameter = []
     model_name = ""
-    if_continue = True
 
     @abc.abstractmethod
     def __init__(self, model_name):
@@ -40,9 +39,6 @@ class Model(object):
     @abc.abstractmethod
     def tune(self):
         return
-
-    def get_if_continue(self):
-        return self.if_continue
 
     def get_model_name(self):
         return self.model_name
