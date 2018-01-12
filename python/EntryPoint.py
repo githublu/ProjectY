@@ -7,7 +7,7 @@ from ManagementOperationStateMachine import *
 
 if is_debug():
     # make debug change in state machine
-    Start(1, 2, 3, 4)
+    Start(1, 2, 3, 4, "cluster")
 else:
     select_statement = sys.argv[1]
     predict_input = sys.argv[2].split(',')

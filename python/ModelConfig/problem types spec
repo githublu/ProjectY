@@ -1,0 +1,18 @@
+problem types spec
+
+
+Regression
+	NumericRegress
+		SVMModel
+		GLR	
+Classification
+	NumericClassification
+		PerceptionModel
+		MLPClassifierModel
+	TextClassification
+		CountVectorizer+TfidfTransformer+SGDClassifier
+Clustering
+	NumericClustering
+		NearestNeighborsModel
+	TextClustering
+		#Missing

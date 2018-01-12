@@ -8,6 +8,7 @@ selectQuery = ""
 modelManager = None
 currentModel = None
 sampleDataset = None
+finalQuery = None
 
 # how many similar entries user wants to find
 findCount = 1
@@ -58,7 +59,7 @@ def ModelSelection():
 
 # return final prediction result
 def FindSimilar():
-    global findCount, currentModel
+    global findCount, currentModel, finalQuery
     outputs = []
     similar_indices = currentModel.predict_count(reference, findCount)
 
@@ -87,10 +88,7 @@ def FindSimilar():
         tmp_query = query
         is_first = True
 
-    if is_debug():
-        return queries
-    else:
-        CreateClusterOutput(queries, findCount)
+    CreateClusterOutput(queries, findCount)
 
 
 # entry point
@@ -115,8 +113,8 @@ def ClusteringStateMachineStart(userSelectQuery, userModelInput, count):
         FSMStates[actionOutcome]()
 
     if actionOutcome in FSMSuccessStableState:
-        log_debug("exit ClusteringStateMachine successfully")
-        return FSMStates[actionOutcome]()
+        log_debug("exit ClusteringStateMachine successfully at state %s" % actionOutcome)
+        FSMStates[actionOutcome]()
     else:
         log_debug("rollback at state %s" % actionOutcome)
 

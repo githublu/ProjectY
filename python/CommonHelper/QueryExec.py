@@ -79,24 +79,38 @@ def CreateClusterOutput(select_queries, max_number):
     id = "cls" + str(uuid.uuid4()).replace('-', '0')
 
     # Drop the cluster table if exists (avoid creating many temp table for clustering)
-    dropTableIfExistsQuery = "DROP TABLE IF EXISTS " + str(id) + ";"
-    CommitQuery(dropTableIfExistsQuery, conn)
-
-    # make the query union together and limit max_number
+    # "SET @tables = NULL;
+    # SELECT GROUP_CONCAT('`', table_schema, '`.`', table_name,'`') INTO @tables FROM information_schema.tables
+    #   WHERE table_schema = 'testdb1' AND table_name LIKE 'cls%';
+    #
+    # SET @tables = CONCAT('DROP TABLE ', @tables);
+    # PREPARE stmt1 FROM @tables;
+    # EXECUTE stmt1;
+    # DEALLOCATE PREPARE stmt1;"
 
     # select into clustering_result table
-    selectSimilarIntoTableQuery = "CREATE TABLE " + str(id) + " (" + select_queries[0] + ");"
+    selectSimilarIntoTableQuery = "CREATE TABLE " + str(id) + " (" + select_queries[0] + " LIMIT " + str(max_number) + ");"
     CommitQuery(selectSimilarIntoTableQuery, conn)
 
     # if there is more than just one query, insert into table with select limit to max number
 
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM " + str(id))
+    for row in cur:
+        max_number -= row[0]
 
-    # select the result back
-    selectResutlQuery = "select * from " + str(id) + ";"
+    queryIndex = 1
+    while max_number > 0 and queryIndex < len(select_queries):
+
+        CommitQuery("INSERT INTO " + str(id) + " (" + select_queries[queryIndex] + " LIMIT " + str(max_number) + ");", conn)
+        cur = conn.cursor()
+        queryIndex += 1
+        cur.execute("SELECT COUNT(*) FROM " + str(id))
+        for row in cur:
+            max_number -= row[0]
 
     conn.close()
-
-    print(selectResutlQuery)
+    print("select * from " + str(id) + ";")
 
 def CommitQuery(query, conn):
     cur = conn.cursor()

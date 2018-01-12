@@ -9,10 +9,12 @@ def CacheModel(user_query, model):
     f.close()
 
 def GetCachedModel(user_query):
-    if file_exit:
-        f = open("/Users/yilu/Projects/mysql-server/python/output.txt","r")
-        modelDumpDes = f.read()
-        f.close()
-        return modelDumpDes
-    else:
-        return False
+    return False
+    #
+    # if file_exit:
+    #     f = open("/Users/yilu/Projects/mysql-server/python/output.txt","r")
+    #     modelDumpDes = f.read()
+    #     f.close()
+    #     return modelDumpDes
+    # else:
+    #     return False

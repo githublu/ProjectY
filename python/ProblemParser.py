@@ -1,4 +1,5 @@
 from CommonHelper.QueryExec import *
+from Constants.ModelType import *
 
 allTypes = {
     "classification": "classification",
@@ -7,12 +8,6 @@ allTypes = {
     "invalid": "invalid"
 }
 
-class ProblemType:
-    type = "invalid"
-    def __init__(self, type):
-        self.type = type
-
-
 # return the type of problem
 # assumes everything columns are in order
 # the last one is target, the rest are features
@@ -20,8 +15,9 @@ def GetProblemType(dateTypeQuery, targetName, type):
     dataTypeTable = ExecQuery(dateTypeQuery)
     dataTypes = {}
     targetType = ""
-    if type == "similar":
-        return ProblemType("clustering")
+    if type == "cluster":
+        # TODO only support all numeric clustering
+        return ModelType.NumericClustering
 
     for row in dataTypeTable:
         dataTypes[row[0]] = row[1]
@@ -29,13 +25,17 @@ def GetProblemType(dateTypeQuery, targetName, type):
             targetType = row[1]
 
     if targetType == "":
-        return ProblemType("invalid")
+        return ModelType.Invalid
 
     if targetType == "int" or targetType == "decimal" or targetType == "float":
-        return ProblemType("regression")
+        return ModelType.Regression
     elif targetType == "varchar" or targetType == "bit":
-        return ProblemType("classification")
+        for row, data_type in dataTypes.items():
+            if row != targetName and data_type == "varchar":
+                return ModelType.TextClassification
+
+        return ModelType.NumericClassification
     else:
-        return ProblemType("invalid")
+        return ModelType.Invalid
 
 # print(GetProblemType("SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species").type)

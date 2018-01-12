@@ -1,6 +1,7 @@
 import sys
 from sklearn.model_selection import train_test_split
 from CommonHelper.QueryExec import *
+from Constants.ModelType import *
 from Models.RegressionModelManager import *
 from Models.ClassificationModelManager import *
 from ClusteringStateMachine import *
@@ -15,8 +16,6 @@ totalDataset = []
 selectQuery = ""
 dataTypeQuery = ""
 targetName = ""
-sourceDataset = []
-targetSet = []
 sourceTrainingSet = []
 targetTrainingSet = []
 sourceTestSet = []
@@ -34,11 +33,16 @@ typeOfProblem = ""
 score = 0
 totalCounter = 0
 testCounts = 0
-problemType = ""
+problemType = "predict"
+testSplitSize = 0.3
+findCount = 1
 
-def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName, type="predict"):
-    global actionOutcome, selectQuery, modelInput, dataTypeQuery, targetName, problemType
-    problemType = type
+def EntryPoint(userSelectQuery, userInput, userdataTypeQuery, userTargetName, type, count):
+    global actionOutcome, selectQuery, modelInput, dataTypeQuery, targetName, problemType, findCount
+    if type == "cluster":
+        problemType = type
+        findCount = count
+
     selectQuery = userSelectQuery
     dataTypeQuery = userdataTypeQuery
     targetName = userTargetName
@@ -76,18 +80,19 @@ def ProblemParsing():
         actionOutcome = "Prediction"
         return
 
-    typeOfProblem = GetProblemType(dataTypeQuery, targetName, problemType).type
-    if typeOfProblem == "regression":
+    typeOfProblem = GetProblemType(dataTypeQuery, targetName, problemType)
+    if typeOfProblem == ModelType.Regression:
         modelManager = RegressionModelManager()
-    elif typeOfProblem == "classification":
-        modelManager = ClassificationModelManager()
+    elif typeOfProblem == ModelType.NumericClassification or typeOfProblem == ModelType.TextClassification:
+        modelManager = ClassificationModelManager(typeOfProblem)
 
         # TODO: or it is text document classification, current only numeric classification is supported
-        # set retry to just one
+        # set currentBestScore = 1 so it can just go to prediction
+        # set testSplitSize = 1
 
     # if there is no cached model and it is clustering problem
     # that use ClusteringStateMachine instead of current statemachine
-    elif typeOfProblem == "clustering":
+    elif typeOfProblem == ModelType.NumericClustering or typeOfProblem == ModelType.TextClustering:
         actionOutcome = "Prediction"
         return
     else:
@@ -131,12 +136,11 @@ def ModelSelection():
 # Include splitting dataset into train set and test set
 # Call model's function for specific preprocessing
 def DataPreprocessing():
-    global actionOutcome, sourceDataset, targetSet, sourceTrainingSet, targetTrainingSet, sourceTestSet, targetTestSet
+    global actionOutcome, sourceTrainingSet, targetTrainingSet, sourceTestSet, targetTestSet
     for X, y in totalDataset:
-        sourceDataset = currentModel.preprocessing(X)
-        targetSet = currentModel.preprocessing(y)
-
-        sourceTrainingSet, sourceTestSet, targetTrainingSet, targetTestSet = train_test_split(X, y, test_size=.3)
+        sourceTrainingSet, sourceTestSet, targetTrainingSet, targetTestSet = train_test_split(X,
+                                                                                              y,
+                                                                                              test_size=testSplitSize)
 
     # skip tuning and use the default parameters
     actionOutcome = "ModelTraining"
@@ -201,13 +205,9 @@ def Prediction():
     global actionOutcome, prediction
 
     # determine if it should be prediction of this statemachine or other statemachine
-    if typeOfProblem == "clustering":
+    if typeOfProblem == ModelType.NumericClustering:
         # overloading targetName with findCount
-        select_queries = ClusteringStateMachineStart(selectQuery, modelInput, targetName)
-        if is_debug() == False:
-            CreateClusterOutput(select_queries, targetName)
-        else:
-            log_debug(select_queries)
+        ClusteringStateMachineStart(selectQuery, modelInput, findCount)
 
         return
 
@@ -225,7 +225,7 @@ def Prediction():
 
     return
 
-def Start(select_statement, predict_input, schema_statement, target_name):
+def Start(select_statement, predict_input, schema_statement, target_name, problem_type):
 
     FSMStates = {
         "PreconditionCheck": PreconditionCheck,
@@ -245,10 +245,17 @@ def Start(select_statement, predict_input, schema_statement, target_name):
 
     # Main entry point
     if is_debug() == False:
-        EntryPoint(select_statement,predict_input, schema_statement, target_name)
+        EntryPoint(select_statement,predict_input, schema_statement, target_name, problem_type)
     else:
-        EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
-        #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species")
+        #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;", ['5.9', '3', '5.1'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "petal_width")
+
+        # regressions model test
+        #EntryPoint("select sepal_length, sepal_width, petal_length, petal_width, species from iris;", ['5.9', '3', '5.1', '1.8'], "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'", "species", "predict")
+
+        # clustering model test
+        EntryPoint("select sepal_length, sepal_width, petal_length, petal_width from iris;",
+                   ['5.9', '3', '5.1', '1.8'],
+                   "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'iris' and TABLE_SCHEMA = 'testdb1'","", "cluster", 2)
         #EntryPoint("select year, population, `violent crime` from crime;", [2014, 326128839],
                    # "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'crime' and TABLE_SCHEMA = 'testdb1'",
                    # "violent crime"

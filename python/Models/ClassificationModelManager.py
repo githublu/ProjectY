@@ -3,20 +3,22 @@ from Models.ModelManager import ModelManager
 from Models.PerceptronModel import *
 from Models.MLPClassifierModel import *
 import json
-
+from Constants.ModelType import *
 
 class ClassificationModelManager(ModelManager):
     modelIndex = -1
+    type = ModelType.NumericClassification;
 
-    def __init__(self):
+    def __init__(self, model_type):
         ModelManager.__init__(self)
         # D:\Projects\ProjectY\python\ModelConfig\model.json
         # /Users/yilu/Projects/mysql-server/python/ModelConfig/model.json
-        with open('/Users/yilu/Projects/mysql-server/python/ModelConfig/model.json') as model_config_file:
+        with open('D:\Projects\ProjectY\python\ModelConfig\model.json') as model_config_file:
             model_config_all = json.load(model_config_file)
 
         self.model_config = model_config_all["Classification"]
         self.modelList = self.model_config["ModelList"]
+        self.type = model_type
 
     def next_model(self):
         self.set_model_index(self.modelIndex + 1)
